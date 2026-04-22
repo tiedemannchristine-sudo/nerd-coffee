@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KERNEL & INIT — Coming Soon</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0c0f;
+    --accent: #00ff9d;
+    --accent2: #00c4ff;
+    --text: #c8d0e0;
+    --muted: #3a4558;
+    --border: #1a2030;
+    --green: #39ff14;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    min-height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  /* Animated grid background */
+  .grid-bg {
+    position: fixed; inset: 0; z-index: 0;
+    background-image:
+      linear-gradient(rgba(0,255,157,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,255,157,0.03) 1px, transparent 1px);
+    background-size: 48px 48px;
+    animation: gridMove 20s linear infinite;
+  }
+  @keyframes gridMove {
+    0%   { background-position: 0 0; }
+    100% { background-position: 48px 48px; }
+  }
+
+  /* Scanlines */
+  .scanlines {
+    position: fixed; inset: 0; z-index: 1; pointer-events: none;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.06) 2px, rgba(0,0,0,0.06) 4px);
+  }
+
+  /* Vignette */
+  .vignette {
+    position: fixed; inset: 0; z-index: 1; pointer-events: none;
+    background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.75) 100%);
+  }
+
+  /* Glitch lines */
+  .glitch-line {
+    position: fixed; left: 0; right: 0; height: 1px;
+    background: rgba(0,255,157,0.15);
+    z-index: 2; pointer-events: none;
+    animation: scanLine 8s linear infinite;
+  }
+  @keyframes scanLine {
+    0%   { top: -2px; opacity: 0; }
+    2%   { opacity: 1; }
+    98%  { opacity: 0.5; }
+    100% { top: 102vh; opacity: 0; }
+  }
+
+  /* MAIN CONTENT */
+  .terminal {
+    position: relative; z-index: 10;
+    width: 100%; max-width: 820px;
+    padding: 2rem;
+    animation: fadeIn 1.2s ease both;
+  }
+  @keyframes fadeIn { from { opacity:0; transform: translateY(24px); } to { opacity:1; transform: none; } }
+
+  /* Top bar */
+  .topbar {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 3rem;
+    animation: fadeIn 1s ease 0.2s both;
+  }
+  .brand {
+    font-size: 0.75rem; font-weight: 800; letter-spacing: 0.2em;
+    color: var(--accent); text-transform: uppercase;
+    text-shadow: 0 0 20px rgba(0,255,157,0.4);
+  }
+  .brand span { color: var(--text); }
+  .status {
+    font-size: 0.58rem; color: var(--muted); letter-spacing: 0.15em;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); box-shadow: 0 0 8px var(--green); animation: blink 1.8s infinite; }
+  @keyframes blink { 50% { opacity: 0.2; } }
+
+  /* Terminal output */
+  .output {
+    margin-bottom: 2.5rem;
+    animation: fadeIn 1s ease 0.4s both;
+  }
+  .line {
+    font-size: 0.65rem; line-height: 2.2; color: var(--muted);
+    opacity: 0; animation: appear 0.1s ease forwards;
+  }
+  .line .cmd  { color: var(--accent); }
+  .line .arg  { color: var(--accent2); }
+  .line .ok   { color: var(--green); }
+  .line .warn { color: #ffb800; }
+
+  /* Staggered line appearance */
+  .line:nth-child(1)  { animation-delay: 0.6s; }
+  .line:nth-child(2)  { animation-delay: 1.0s; }
+  .line:nth-child(3)  { animation-delay: 1.4s; }
+  .line:nth-child(4)  { animation-delay: 1.8s; }
+  .line:nth-child(5)  { animation-delay: 2.2s; }
+  .line:nth-child(6)  { animation-delay: 2.6s; }
+  .line:nth-child(7)  { animation-delay: 3.0s; }
+  @keyframes appear { to { opacity: 1; } }
+
+  /* Hero heading */
+  .hero {
+    margin-bottom: 2.5rem;
+    opacity: 0; animation: fadeIn 0.8s ease 3.4s both;
+  }
+  .hero h1 {
+    font-size: clamp(3.5rem, 10vw, 7rem);
+    font-weight: 800; line-height: 0.9; letter-spacing: -0.03em;
+  }
+  .h-k { color: var(--accent); text-shadow: 0 0 60px rgba(0,255,157,0.2); }
+  .h-amp { color: var(--border); font-weight: 300; }
+  .h-i { color: var(--text); }
+  .hero-sub {
+    font-size: 0.68rem; color: var(--muted); margin-top: 1rem;
+    letter-spacing: 0.06em; line-height: 1.9;
+  }
+  .hero-sub em { font-style: normal; color: var(--accent2); }
+
+  /* Progress bar */
+  .progress-wrap {
+    margin-bottom: 2rem;
+    opacity: 0; animation: fadeIn 0.6s ease 3.8s both;
+  }
+  .progress-label {
+    display: flex; justify-content: space-between;
+    font-size: 0.55rem; color: var(--muted); letter-spacing: 0.2em;
+    text-transform: uppercase; margin-bottom: 0.5rem;
+  }
+  .progress-bar {
+    height: 3px; background: var(--border); position: relative; overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2));
+    width: 0;
+    animation: fillBar 2s ease 4.2s forwards;
+    box-shadow: 0 0 12px rgba(0,255,157,0.5);
+  }
+  @keyframes fillBar { to { width: 78%; } }
+  .progress-glow {
+    position: absolute; top: -4px; bottom: -4px; width: 20px;
+    background: rgba(0,255,157,0.6); filter: blur(6px);
+    animation: glowMove 2s ease 4.2s forwards;
+    left: 0;
+  }
+  @keyframes glowMove { to { left: calc(78% - 10px); } }
+
+  /* Bottom info */
+  .bottom {
+    display: grid; grid-template-columns: 1fr 1fr 1fr;
+    gap: 1px; background: var(--border);
+    border: 1px solid var(--border);
+    opacity: 0; animation: fadeIn 0.6s ease 4.8s both;
+  }
+  @media(max-width:600px) { .bottom { grid-template-columns: 1fr; } }
+
+  .info-cell {
+    background: var(--bg); padding: 1.2rem 1.5rem;
+  }
+  .info-k { font-size: 0.5rem; color: var(--muted); letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 0.5rem; }
+  .info-v { font-size: 0.8rem; color: var(--text); font-weight: 600; }
+  .info-v a { color: var(--accent2); text-decoration: none; }
+  .info-v a:hover { color: var(--accent); }
+
+  /* Email form */
+  .notify {
+    margin-top: 2rem;
+    opacity: 0; animation: fadeIn 0.6s ease 5.2s both;
+  }
+  .notify-label {
+    font-size: 0.55rem; color: var(--muted); letter-spacing: 0.2em;
+    text-transform: uppercase; margin-bottom: 0.6rem;
+  }
+  .notify-label::before { content: '// '; color: var(--accent); }
+  .notify-form {
+    display: flex; gap: 0; border: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .notify-input {
+    flex: 1; background: var(--bg); border: none; outline: none;
+    padding: 0.8rem 1rem; font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem; color: var(--text);
+  }
+  .notify-input::placeholder { color: var(--muted); }
+  .notify-input:focus { background: #0e1218; }
+  .notify-btn {
+    background: var(--accent); color: var(--bg); border: none;
+    padding: 0.8rem 1.5rem; font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem; font-weight: 800; letter-spacing: 0.15em;
+    text-transform: uppercase; cursor: pointer; white-space: nowrap;
+    transition: filter 0.2s;
+  }
+  .notify-btn:hover { filter: brightness(0.85); }
+  .notify-success {
+    display: none; font-size: 0.65rem; color: var(--green);
+    margin-top: 0.5rem; letter-spacing: 0.1em;
+  }
+</style>
+</head>
+<body>
+
+<div class="grid-bg"></div>
+<div class="scanlines"></div>
+<div class="vignette"></div>
+<div class="glitch-line"></div>
+
+<div class="terminal">
+
+  <div class="topbar">
+    <div class="brand">KERNEL<span> &amp; </span>INIT</div>
+    <div class="status"><span class="dot"></span>SYSTEM INITIALIZING</div>
+  </div>
+
+  <div class="output">
+    <div class="line"><span class="cmd">$</span> git clone https://github.com/lenoko/nerd-coffee</div>
+    <div class="line"><span class="ok">✓</span> Cloning into <span class="arg">'nerd-coffee'</span>... done.</div>
+    <div class="line"><span class="cmd">$</span> ./setup.sh --roast-on-demand --specialty-grade</div>
+    <div class="line"><span class="ok">✓</span> Sourcing green coffee... <span class="arg">Honduras · Peru</span></div>
+    <div class="line"><span class="ok">✓</span> Calibrating roast curves... <span class="arg">KERNEL</span> &amp; <span class="arg">INIT</span> ready</div>
+    <div class="line"><span class="warn">⚠</span> Awaiting final build... <span class="arg">labels in production</span></div>
+    <div class="line"><span class="cmd">$</span> <span class="warn">// launching soon.</span></div>
+  </div>
+
+  <div class="hero">
+    <h1>
+      <span class="h-k">KERNEL</span><br>
+      <span class="h-amp">&amp;</span> <span class="h-i">INIT</span>
+    </h1>
+    <div class="hero-sub">
+      Specialty Coffee · Frisch geröstet auf Bestellung · Linz am Rhein<br>
+      <em>roasted to order</em> · shipped within 48h · <em>no stale beans. ever.</em>
+    </div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-label">
+      <span>build progress</span>
+      <span id="pct">0%</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill"></div>
+      <div class="progress-glow"></div>
+    </div>
+  </div>
+
+  <div class="bottom">
+    <div class="info-cell">
+      <div class="info-k">Status</div>
+      <div class="info-v">Work in Progress</div>
+    </div>
+    <div class="info-cell">
+      <div class="info-k">Launch</div>
+      <div class="info-v">bald™</div>
+    </div>
+    <div class="info-cell">
+      <div class="info-k">Kontakt</div>
+      <div class="info-v"><a href="mailto:info@lenoko.de">info@lenoko.de</a></div>
+    </div>
+  </div>
+
+  <div class="notify">
+    <div class="notify-label">Notify me on launch</div>
+    <div class="notify-form">
+      <input type="email" class="notify-input" id="email-input" placeholder="deine@email.dev">
+      <button class="notify-btn" onclick="handleNotify()">$ subscribe</button>
+    </div>
+    <div class="notify-success" id="notify-success">
+      ✓ gespeichert. wir melden uns wenn wir live gehen.
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // Animate progress percentage counter
+  const pctEl = document.getElementById('pct');
+  let current = 0;
+  const target = 78;
+  const start = 4200; // matches animation delay
+
+  setTimeout(() => {
+    const interval = setInterval(() => {
+      current++;
+      pctEl.textContent = current + '%';
+      if (current >= target) clearInterval(interval);
+    }, 2000 / target);
+  }, start);
+
+  // Email notify — stores in mailto for now
+  function handleNotify() {
+    const email = document.getElementById('email-input').value.trim();
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      document.getElementById('email-input').style.borderBottom = '1px solid #ff3366';
+      return;
+    }
+    // Opens a pre-filled mailto so you receive the address
+    window.location.href = 'mailto:info@lenoko.de?subject=Launch Notification&body=Bitte benachrichtigt mich wenn KERNEL %26 INIT live geht: ' + encodeURIComponent(email);
+    document.getElementById('notify-success').style.display = 'block';
+    document.getElementById('email-input').value = '';
+  }
+
+  // Enter key on input
+  document.getElementById('email-input').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') handleNotify();
+  });
+</script>
+
+</body>
+</html>
