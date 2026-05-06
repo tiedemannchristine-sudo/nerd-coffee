@@ -1,0 +1,17 @@
+{
+  "name": "KERNEL & INIT — Specialty Coffee by LeNoKo",
+  "short_name": "KERNEL & INIT",
+  "description": "Frisch gerösteter Specialty Coffee aus der LeNoKo Rösterei in Linz am Rhein.",
+  "icons": [
+    { "src": "favicon.svg",       "type": "image/svg+xml", "sizes": "any"     },
+    { "src": "icon-192.png",      "type": "image/png",     "sizes": "192x192" },
+    { "src": "icon-512.png",      "type": "image/png",     "sizes": "512x512" },
+    { "src": "icon-512.png",      "type": "image/png",     "sizes": "512x512", "purpose": "maskable" }
+  ],
+  "theme_color": "#0a0c0f",
+  "background_color": "#0a0c0f",
+  "display": "standalone",
+  "scope": "/",
+  "start_url": "/",
+  "lang": "de"
+}
