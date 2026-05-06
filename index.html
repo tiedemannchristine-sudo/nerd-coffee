@@ -3,331 +3,1055 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KERNEL & INIT — Coming Soon</title>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;700;800&display=swap" rel="stylesheet">
+<title>KERNEL & INIT — Specialty Coffee by LeNoKo</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;800&family=Space+Grotesk:wght@300;400;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0a0c0f;
-    --accent: #00ff9d;
+    --bg:      #0a0c0f;
+    --panel:   #111419;
+    --border:  #1e2430;
+    --accent:  #00ff9d;
     --accent2: #00c4ff;
-    --text: #c8d0e0;
-    --muted: #3a4558;
-    --border: #1a2030;
-    --green: #39ff14;
+    --text:    #c8d0e0;
+    --muted:   #4a5568;
+    --green:   #39ff14;
+    --red:     #ff3366;
   }
 
   * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
 
   body {
     background: var(--bg);
     color: var(--text);
     font-family: 'JetBrains Mono', monospace;
-    min-height: 100vh;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    position: relative;
+    overflow-x: hidden;
   }
 
-  /* Animated grid background */
-  .grid-bg {
-    position: fixed; inset: 0; z-index: 0;
+  body::before {
+    content:''; position:fixed; inset:0;
+    background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.04) 2px,rgba(0,0,0,0.04) 4px);
+    pointer-events:none; z-index:9999;
+  }
+  body::after {
+    content:''; position:fixed; inset:0;
     background-image:
-      linear-gradient(rgba(0,255,157,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,255,157,0.03) 1px, transparent 1px);
-    background-size: 48px 48px;
-    animation: gridMove 20s linear infinite;
-  }
-  @keyframes gridMove {
-    0%   { background-position: 0 0; }
-    100% { background-position: 48px 48px; }
+      linear-gradient(rgba(0,255,157,0.025) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(0,255,157,0.025) 1px,transparent 1px);
+    background-size:40px 40px;
+    pointer-events:none; z-index:0;
   }
 
-  /* Scanlines */
-  .scanlines {
-    position: fixed; inset: 0; z-index: 1; pointer-events: none;
-    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.06) 2px, rgba(0,0,0,0.06) 4px);
+  /* HEADER */
+  header {
+    position:fixed; top:0; left:0; right:0; z-index:100;
+    height:56px; border-bottom:1px solid var(--border);
+    background:rgba(10,12,15,0.93); backdrop-filter:blur(14px);
+    padding:0 2rem; display:flex; align-items:center; justify-content:space-between;
   }
+  .logo {
+    font-size:1rem; font-weight:800; letter-spacing:0.18em;
+    color:var(--accent); text-transform:uppercase;
+    text-shadow:0 0 22px rgba(0,255,157,0.35);
+    animation:glitch 6s infinite;
+  }
+  .logo span { color:var(--text); }
+  @keyframes glitch {
+    0%,88%,100%{transform:none;text-shadow:0 0 22px rgba(0,255,157,0.35);}
+    90%{transform:translate(-2px,0);text-shadow:2px 0 #ff3366,-2px 0 #00c4ff;}
+    92%{transform:translate(2px,0);text-shadow:-2px 0 #ff3366,2px 0 #00c4ff;}
+    94%{transform:none;}
+  }
+  .nav-bar { display:flex; gap:1.5rem; align-items:center; }
+  .status-pill { display:flex; align-items:center; gap:6px; color:var(--muted); font-size:0.6rem; letter-spacing:0.1em; }
+  .dot { width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);animation:blink 2s infinite; }
+  @keyframes blink{50%{opacity:0.2;}}
+  .nav-link { color:var(--muted); text-decoration:none; font-size:0.65rem; letter-spacing:0.1em; transition:color 0.2s; }
+  .nav-link:hover { color:var(--accent); }
 
-  /* Vignette */
-  .vignette {
-    position: fixed; inset: 0; z-index: 1; pointer-events: none;
-    background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.75) 100%);
-  }
+  /* NUTRITION */
+  .nutrition-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.5px; background:var(--border); border:1.5px solid var(--border); }
+  @media(max-width:700px){.nutrition-grid{grid-template-columns:1fr;}}
+  .nutrition-card { background:var(--panel); padding:2rem; }
+  .nutrition-card-title { font-size:0.58rem; letter-spacing:0.25em; color:var(--muted); text-transform:uppercase; margin-bottom:1.2rem; }
+  .nutrition-card-title span { color:var(--accent); }
+  .nutrition-card-title.init-color span { color:var(--accent2); }
+  .nw-table { width:100%; border-collapse:collapse; font-size:0.72rem; }
+  .nw-table tr { border-bottom:1px solid var(--border); }
+  .nw-table tr:last-child { border-bottom:none; }
+  .nw-table td { padding:0.55rem 0; }
+  .nw-table td:first-child { color:var(--muted); }
+  .nw-table td:last-child { color:var(--text); text-align:right; font-weight:600; }
+  .nw-table tr.sub td:first-child { padding-left:1rem; font-size:0.67rem; }
+  .nw-table tr.total-row td { color:var(--text); font-weight:700; font-size:0.78rem; }
+  .nw-note { font-family:'Space Grotesk',sans-serif; font-size:0.7rem; color:var(--muted); margin-top:1.2rem; line-height:1.6; border-top:1px solid var(--border); padding-top:1rem; }
 
-  /* Glitch lines */
-  .glitch-line {
-    position: fixed; left: 0; right: 0; height: 1px;
-    background: rgba(0,255,157,0.15);
-    z-index: 2; pointer-events: none;
-    animation: scanLine 8s linear infinite;
-  }
-  @keyframes scanLine {
-    0%   { top: -2px; opacity: 0; }
-    2%   { opacity: 1; }
-    98%  { opacity: 0.5; }
-    100% { top: 102vh; opacity: 0; }
-  }
-
-  /* MAIN CONTENT */
-  .terminal {
-    position: relative; z-index: 10;
-    width: 100%; max-width: 820px;
-    padding: 2rem;
-    animation: fadeIn 1.2s ease both;
-  }
-  @keyframes fadeIn { from { opacity:0; transform: translateY(24px); } to { opacity:1; transform: none; } }
-
-  /* Top bar */
-  .topbar {
-    display: flex; justify-content: space-between; align-items: center;
-    margin-bottom: 3rem;
-    animation: fadeIn 1s ease 0.2s both;
-  }
-  .brand {
-    font-size: 0.75rem; font-weight: 800; letter-spacing: 0.2em;
-    color: var(--accent); text-transform: uppercase;
-    text-shadow: 0 0 20px rgba(0,255,157,0.4);
-  }
-  .brand span { color: var(--text); }
-  .status {
-    font-size: 0.58rem; color: var(--muted); letter-spacing: 0.15em;
-    display: flex; align-items: center; gap: 8px;
-  }
-  .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); box-shadow: 0 0 8px var(--green); animation: blink 1.8s infinite; }
-  @keyframes blink { 50% { opacity: 0.2; } }
-
-  /* Terminal output */
-  .output {
-    margin-bottom: 2.5rem;
-    animation: fadeIn 1s ease 0.4s both;
-  }
-  .line {
-    font-size: 0.65rem; line-height: 2.2; color: var(--muted);
-    opacity: 0; animation: appear 0.1s ease forwards;
-  }
-  .line .cmd  { color: var(--accent); }
-  .line .arg  { color: var(--accent2); }
-  .line .ok   { color: var(--green); }
-  .line .warn { color: #ffb800; }
-
-  /* Staggered line appearance */
-  .line:nth-child(1)  { animation-delay: 0.6s; }
-  .line:nth-child(2)  { animation-delay: 1.0s; }
-  .line:nth-child(3)  { animation-delay: 1.4s; }
-  .line:nth-child(4)  { animation-delay: 1.8s; }
-  .line:nth-child(5)  { animation-delay: 2.2s; }
-  .line:nth-child(6)  { animation-delay: 2.6s; }
-  .line:nth-child(7)  { animation-delay: 3.0s; }
-  @keyframes appear { to { opacity: 1; } }
-
-  /* Hero heading */
+  /* HERO */
   .hero {
-    margin-bottom: 2.5rem;
-    opacity: 0; animation: fadeIn 0.8s ease 3.4s both;
+    position:relative; z-index:1; min-height:100vh;
+    display:flex; flex-direction:column; justify-content:center;
+    padding:7rem 2rem 4rem; max-width:1100px; margin:0 auto;
   }
+  .prompt { font-size:0.68rem; color:var(--muted); margin-bottom:1.2rem; letter-spacing:0.08em; }
+  .prompt .pu{color:var(--accent);} .prompt .ph{color:var(--accent2);}
+
   .hero h1 {
-    font-size: clamp(3.5rem, 10vw, 7rem);
-    font-weight: 800; line-height: 0.9; letter-spacing: -0.03em;
+    font-size:clamp(3rem,9vw,6.5rem);
+    font-weight:800; line-height:0.92; letter-spacing:-0.02em; margin-bottom:1.8rem;
   }
-  .h-k { color: var(--accent); text-shadow: 0 0 60px rgba(0,255,157,0.2); }
-  .h-amp { color: var(--border); font-weight: 300; }
-  .h-i { color: var(--text); }
-  .hero-sub {
-    font-size: 0.68rem; color: var(--muted); margin-top: 1rem;
-    letter-spacing: 0.06em; line-height: 1.9;
-  }
-  .hero-sub em { font-style: normal; color: var(--accent2); }
+  .h-k { color:var(--accent); text-shadow:0 0 40px rgba(0,255,157,0.22); }
+  .h-amp { color:var(--border); font-weight:300; }
+  .h-i { color:var(--text); }
+  .h-sub { display:block; font-size:0.35em; font-weight:300; color:var(--muted); margin-top:0.5em; letter-spacing:0.04em; }
 
-  /* Progress bar */
-  .progress-wrap {
-    margin-bottom: 2rem;
-    opacity: 0; animation: fadeIn 0.6s ease 3.8s both;
-  }
-  .progress-label {
-    display: flex; justify-content: space-between;
-    font-size: 0.55rem; color: var(--muted); letter-spacing: 0.2em;
-    text-transform: uppercase; margin-bottom: 0.5rem;
-  }
-  .progress-bar {
-    height: 3px; background: var(--border); position: relative; overflow: hidden;
-  }
-  .progress-fill {
-    height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2));
-    width: 0;
-    animation: fillBar 2s ease 4.2s forwards;
-    box-shadow: 0 0 12px rgba(0,255,157,0.5);
-  }
-  @keyframes fillBar { to { width: 78%; } }
-  .progress-glow {
-    position: absolute; top: -4px; bottom: -4px; width: 20px;
-    background: rgba(0,255,157,0.6); filter: blur(6px);
-    animation: glowMove 2s ease 4.2s forwards;
-    left: 0;
-  }
-  @keyframes glowMove { to { left: calc(78% - 10px); } }
+  .hero-meta { display:flex; flex-wrap:wrap; gap:0.5rem 2rem; margin-bottom:2.5rem; font-size:0.65rem; color:var(--muted); }
+  .hero-meta span::before { content:'// '; color:var(--accent); }
 
-  /* Bottom info */
-  .bottom {
-    display: grid; grid-template-columns: 1fr 1fr 1fr;
-    gap: 1px; background: var(--border);
-    border: 1px solid var(--border);
-    opacity: 0; animation: fadeIn 0.6s ease 4.8s both;
+  .cta-row { display:flex; gap:1rem; flex-wrap:wrap; }
+  .btn-primary {
+    background:var(--accent); color:var(--bg); border:none; padding:0.85rem 2rem;
+    font-family:'JetBrains Mono',monospace; font-size:0.72rem; font-weight:800;
+    letter-spacing:0.15em; text-transform:uppercase; cursor:pointer;
+    text-decoration:none; display:inline-block; transition:filter 0.2s;
+    clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,0 100%);
   }
-  @media(max-width:600px) { .bottom { grid-template-columns: 1fr; } }
+  .btn-primary:hover{filter:brightness(0.85);}
+  .btn-secondary {
+    background:transparent; color:var(--muted); border:1px solid var(--border); padding:0.85rem 2rem;
+    font-family:'JetBrains Mono',monospace; font-size:0.72rem;
+    letter-spacing:0.12em; text-transform:uppercase; cursor:pointer;
+    text-decoration:none; display:inline-block; transition:all 0.2s;
+  }
+  .btn-secondary:hover{border-color:var(--accent2);color:var(--accent2);}
 
-  .info-cell {
-    background: var(--bg); padding: 1.2rem 1.5rem;
-  }
-  .info-k { font-size: 0.5rem; color: var(--muted); letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 0.5rem; }
-  .info-v { font-size: 0.8rem; color: var(--text); font-weight: 600; }
-  .info-v a { color: var(--accent2); text-decoration: none; }
-  .info-v a:hover { color: var(--accent); }
+  .hero>*{animation:fadeUp 0.6s ease both;}
+  .hero>*:nth-child(1){animation-delay:0.1s;} .hero>*:nth-child(2){animation-delay:0.25s;}
+  .hero>*:nth-child(3){animation-delay:0.4s;} .hero>*:nth-child(4){animation-delay:0.55s;}
+  .hero>*:nth-child(5){animation-delay:0.7s;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:none;}}
 
-  /* Email form */
-  .notify {
-    margin-top: 2rem;
-    opacity: 0; animation: fadeIn 0.6s ease 5.2s both;
+  /* SPECS BAR */
+  .specs-bar {
+    position:relative; z-index:1; background:var(--panel);
+    border-top:1px solid var(--border); border-bottom:1px solid var(--border);
+    padding:1.2rem 2rem; overflow-x:auto;
   }
-  .notify-label {
-    font-size: 0.55rem; color: var(--muted); letter-spacing: 0.2em;
-    text-transform: uppercase; margin-bottom: 0.6rem;
+  .specs-inner { max-width:1100px; margin:0 auto; display:flex; gap:3rem; align-items:center; white-space:nowrap; }
+  .spec { display:flex; flex-direction:column; gap:0.2rem; }
+  .spec-k { font-size:0.5rem; color:var(--muted); letter-spacing:0.2em; text-transform:uppercase; }
+  .spec-v { font-size:0.85rem; font-weight:600; color:var(--accent); }
+
+  /* SECTION */
+  .section { position:relative; z-index:1; max-width:1100px; margin:0 auto; padding:5rem 2rem; }
+  .sec-label { font-size:0.58rem; letter-spacing:0.3em; color:var(--muted); text-transform:uppercase; margin-bottom:0.4rem; }
+  .sec-label::before{content:'// ';color:var(--accent);}
+  .sec-title { font-size:clamp(1.5rem,4vw,2.4rem); font-weight:800; color:var(--text); margin-bottom:3rem; letter-spacing:-0.02em; }
+  .sec-title em{font-style:normal;color:var(--accent);}
+
+  /* PRODUCTS */
+  .products-grid {
+    display:grid; grid-template-columns:1fr 1fr;
+    gap:1.5px; background:var(--border); border:1.5px solid var(--border);
   }
-  .notify-label::before { content: '// '; color: var(--accent); }
-  .notify-form {
-    display: flex; gap: 0; border: 1px solid var(--border);
-    overflow: hidden;
+  @media(max-width:700px){.products-grid{grid-template-columns:1fr;}}
+
+  .product-card { background:var(--panel); padding:2.5rem; position:relative; overflow:hidden; transition:background 0.2s; }
+  .product-card:hover{background:#161b24;}
+  .product-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;opacity:0;transition:opacity 0.3s;}
+  .card-kernel::before{background:linear-gradient(90deg,transparent,var(--accent),transparent);}
+  .card-init::before{background:linear-gradient(90deg,transparent,var(--accent2),transparent);}
+  .product-card:hover::before{opacity:1;}
+
+  .prod-image{display:block;width:100%;max-width:320px;height:auto;margin:0 auto 1.5rem auto;filter:drop-shadow(0 8px 28px rgba(0,0,0,0.45));}
+  .prod-id{font-size:0.52rem;color:var(--muted);letter-spacing:0.2em;margin-bottom:1.2rem;}
+  .prod-name{font-size:3rem;font-weight:800;line-height:1;letter-spacing:-0.03em;margin-bottom:0.2rem;}
+  .card-kernel .prod-name{color:var(--accent);}
+  .card-init   .prod-name{color:var(--accent2);}
+  .prod-pid{font-size:0.58rem;color:var(--muted);margin-bottom:0.4rem;letter-spacing:0.08em;}
+  .prod-tagline{font-size:1rem;font-weight:600;color:var(--text);margin-bottom:1rem;letter-spacing:0.02em;}
+  .prod-desc{font-family:'Space Grotesk',sans-serif;font-size:0.82rem;color:var(--muted);line-height:1.75;margin-bottom:1.8rem;}
+
+  .prod-attrs{display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;margin-bottom:1.8rem;}
+  .attr{display:flex;flex-direction:column;gap:0.2rem;}
+  .attr-k{font-size:0.5rem;color:var(--muted);letter-spacing:0.18em;text-transform:uppercase;}
+  .attr-v{font-size:0.75rem;color:var(--text);}
+
+  .prod-prices{border-top:1px solid var(--border);padding-top:1.2rem;display:flex;gap:1.5rem;flex-wrap:wrap;align-items:baseline;}
+  .price-item{display:flex;flex-direction:column;gap:0.15rem;}
+  .price-size{font-size:0.5rem;color:var(--muted);letter-spacing:0.15em;text-transform:uppercase;}
+  .price-val{font-size:1rem;font-weight:700;color:var(--text);}
+  .prod-cta{margin-top:1.5rem;}
+  .btn-order {
+    background:transparent; border:1px solid var(--accent); color:var(--accent);
+    padding:0.55rem 1.4rem; font-family:'JetBrains Mono',monospace;
+    font-size:0.65rem; font-weight:700; letter-spacing:0.15em; text-transform:uppercase;
+    cursor:pointer; text-decoration:none; display:inline-block; transition:all 0.2s;
   }
-  .notify-input {
-    flex: 1; background: var(--bg); border: none; outline: none;
-    padding: 0.8rem 1rem; font-family: 'JetBrains Mono', monospace;
-    font-size: 0.72rem; color: var(--text);
-  }
-  .notify-input::placeholder { color: var(--muted); }
-  .notify-input:focus { background: #0e1218; }
-  .notify-btn {
-    background: var(--accent); color: var(--bg); border: none;
-    padding: 0.8rem 1.5rem; font-family: 'JetBrains Mono', monospace;
-    font-size: 0.68rem; font-weight: 800; letter-spacing: 0.15em;
-    text-transform: uppercase; cursor: pointer; white-space: nowrap;
-    transition: filter 0.2s;
-  }
-  .notify-btn:hover { filter: brightness(0.85); }
-  .notify-success {
-    display: none; font-size: 0.65rem; color: var(--green);
-    margin-top: 0.5rem; letter-spacing: 0.1em;
-  }
+  .card-init .btn-order{border-color:var(--accent2);color:var(--accent2);}
+  .btn-order:hover{background:var(--accent);color:var(--bg);}
+  .card-init .btn-order:hover{background:var(--accent2);color:var(--bg);}
+
+  /* PROCESS */
+  .terminal-block{background:var(--panel);border:1px solid var(--border);padding:2rem;margin-bottom:2rem;position:relative;}
+  .terminal-block::before{content:attr(data-label);position:absolute;top:-0.65rem;left:1rem;background:var(--panel);padding:0 0.5rem;font-size:0.55rem;letter-spacing:0.2em;color:var(--accent);text-transform:uppercase;}
+  .tline{font-size:0.72rem;line-height:2.1;}
+  .tline .cmd{color:var(--accent);margin-right:0.5rem;} .tline .arg{color:var(--accent2);} .tline .cmt{color:var(--muted);}
+
+  .process-steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);margin-top:2rem;}
+  .step{background:var(--panel);padding:1.5rem;}
+  .step-num{font-size:2.2rem;font-weight:800;color:var(--border);line-height:1;margin-bottom:0.5rem;}
+  .step-title{font-size:0.75rem;font-weight:700;color:var(--accent);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.4rem;}
+  .step-desc{font-family:'Space Grotesk',sans-serif;font-size:0.75rem;color:var(--muted);line-height:1.6;}
+
+  /* CHECKOUT */
+  .checkout-section{position:relative;z-index:1;background:var(--panel);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:4rem 2rem;}
+  .checkout-inner{max-width:760px;margin:0 auto;}
+
+  .steps-indicator{display:flex;margin-bottom:2.5rem;border:1px solid var(--border);overflow:hidden;}
+  .step-tab{flex:1;padding:0.75rem 0.5rem;font-size:0.58rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);background:var(--bg);border-right:1px solid var(--border);text-align:center;transition:all 0.2s;}
+  .step-tab:last-child{border-right:none;}
+  .step-tab.active{background:var(--panel);color:var(--accent);border-bottom:2px solid var(--accent);}
+  .step-tab.done{color:var(--green);}
+
+  .form-panel{display:none;} .form-panel.active{display:block;}
+
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;}
+  .form-row.full{grid-template-columns:1fr;}
+  @media(max-width:580px){.form-row{grid-template-columns:1fr;}}
+
+  .field-group{display:flex;flex-direction:column;gap:0.4rem;}
+  .field-label{font-size:0.52rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);}
+  .field-input,.field-select{background:var(--bg);border:1px solid var(--border);color:var(--text);padding:0.75rem 1rem;font-family:'JetBrains Mono',monospace;font-size:0.75rem;outline:none;width:100%;appearance:none;transition:border-color 0.2s;}
+  .field-input:focus,.field-select:focus{border-color:var(--accent);}
+  .field-input.error{border-color:var(--red);}
+  .field-select option{background:var(--bg);}
+  .error-msg{font-size:0.58rem;color:var(--red);margin-top:0.2rem;display:none;}
+
+  .price-preview{background:var(--bg);border:1px solid var(--border);padding:1rem 1.2rem;margin-top:1rem;display:flex;justify-content:space-between;align-items:center;}
+  .pp-label{font-size:0.55rem;color:var(--muted);letter-spacing:0.15em;text-transform:uppercase;}
+  .pp-val{font-size:1.2rem;font-weight:800;color:var(--accent);}
+
+  .form-actions{display:flex;justify-content:space-between;align-items:center;margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--border);gap:1rem;}
+  .btn-next{background:var(--accent);color:var(--bg);border:none;padding:0.8rem 2rem;font-family:'JetBrains Mono',monospace;font-size:0.7rem;font-weight:800;letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;transition:filter 0.2s;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,0 100%);}
+  .btn-next:hover{filter:brightness(0.85);}
+  .btn-back{background:transparent;color:var(--muted);border:1px solid var(--border);padding:0.8rem 1.5rem;font-family:'JetBrains Mono',monospace;font-size:0.7rem;letter-spacing:0.1em;cursor:pointer;transition:all 0.2s;}
+  .btn-back:hover{border-color:var(--accent2);color:var(--accent2);}
+
+  .summary-block{background:var(--bg);border:1px solid var(--border);padding:1.5rem;margin-bottom:1.5rem;}
+  .summary-title{font-size:0.52rem;letter-spacing:0.2em;color:var(--muted);text-transform:uppercase;margin-bottom:1rem;}
+  .summary-row{display:flex;justify-content:space-between;font-size:0.72rem;padding:0.5rem 0;border-bottom:1px solid var(--border);}
+  .summary-row:last-child{border-bottom:none;}
+  .s-key{color:var(--muted);} .s-val{color:var(--text);}
+  .summary-row.total .s-val{color:var(--accent);font-size:1.1rem;font-weight:800;}
+
+  .widerruf-box{background:var(--bg);border:1px solid var(--border);padding:1.2rem;margin-bottom:1.5rem;display:flex;gap:1rem;align-items:flex-start;}
+  .widerruf-box input[type=checkbox]{width:16px;height:16px;flex-shrink:0;margin-top:3px;accent-color:var(--accent);cursor:pointer;}
+  .widerruf-text{font-family:'Space Grotesk',sans-serif;font-size:0.72rem;color:var(--muted);line-height:1.65;}
+  .widerruf-text strong{color:var(--text);}
+  .widerruf-err{font-size:0.6rem;color:var(--red);margin-top:0.5rem;display:none;}
+
+  .btn-paypal{width:100%;background:#FFB800;color:#1a1a1a;border:none;padding:1.1rem;font-family:'JetBrains Mono',monospace;font-size:0.8rem;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:0.6rem;margin-bottom:1rem;}
+  .btn-paypal:hover{background:#e6a800;box-shadow:0 0 20px rgba(255,184,0,0.25);}
+
+  .paypal-note{font-size:0.58rem;color:var(--muted);text-align:center;line-height:1.8;}
+  .paypal-note a{color:var(--accent2);text-decoration:none;}
+
+  .success-screen{display:none;text-align:center;padding:3rem 2rem;}
+  .success-screen h3{font-size:1.2rem;color:var(--accent);margin-bottom:0.8rem;}
+  .success-screen p{font-family:'Space Grotesk',sans-serif;font-size:0.82rem;color:var(--muted);line-height:1.7;}
+
+  /* ORDER-ID-CHECKOUT */
+  .order-id-box{background:var(--bg);border:2px solid var(--accent);padding:1.6rem;margin:1.5rem 0;text-align:center;position:relative;}
+  .order-id-label{font-size:0.58rem;letter-spacing:0.3em;color:var(--accent);text-transform:uppercase;margin-bottom:0.6rem;}
+  .order-id-value{font-size:2rem;font-weight:800;color:var(--text);letter-spacing:0.1em;font-family:'JetBrains Mono',monospace;line-height:1.2;margin-bottom:0.8rem;}
+  .order-id-copy{background:var(--accent);color:var(--bg);border:none;padding:0.65rem 1.5rem;font-family:'JetBrains Mono',monospace;font-size:0.7rem;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;cursor:pointer;transition:filter 0.2s;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,0 100%);}
+  .order-id-copy:hover{filter:brightness(0.85);}
+  .order-id-copy.copied{background:var(--green);}
+  .order-id-warn{background:#2a1616;border:1px solid var(--red);color:#ffb8c5;padding:1rem 1.2rem;font-size:0.75rem;line-height:1.6;margin:1.2rem 0;display:flex;gap:0.8rem;align-items:flex-start;}
+  .order-id-warn-icon{color:var(--red);font-size:1.1rem;font-weight:800;flex-shrink:0;}
+  .order-id-warn strong{color:var(--red);}
+  .step-instructions{background:var(--bg);border:1px solid var(--border);padding:1.2rem;margin:1rem 0;font-size:0.75rem;line-height:1.7;}
+  .step-instructions ol{list-style:none;counter-reset:step;padding:0;}
+  .step-instructions li{counter-increment:step;padding:0.4rem 0;padding-left:2rem;position:relative;}
+  .step-instructions li::before{content:counter(step);position:absolute;left:0;top:0.4rem;width:1.3rem;height:1.3rem;background:var(--accent);color:var(--bg);font-weight:800;font-size:0.7rem;display:flex;align-items:center;justify-content:center;border-radius:50%;}
+  .btn-registering{background:var(--muted)!important;cursor:wait!important;}
+
+  /* LEGAL + FOOTER */
+  .legal-band{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:1.5rem 2rem;display:flex;flex-wrap:wrap;gap:0.5rem 2rem;font-size:0.58rem;color:var(--muted);border-top:1px solid var(--border);}
+  .legal-band a{color:var(--muted);text-decoration:none;} .legal-band a:hover{color:var(--accent);}
+
+  footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:1.5rem 2rem;max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.5rem;font-size:0.6rem;color:var(--muted);}
+  footer a{color:var(--muted);text-decoration:none;} footer a:hover{color:var(--accent);}
+  .footer-brand{color:var(--accent);font-weight:800;}
 </style>
 </head>
 <body>
 
-<div class="grid-bg"></div>
-<div class="scanlines"></div>
-<div class="vignette"></div>
-<div class="glitch-line"></div>
+<header>
+  <div class="logo">KERNEL<span> &amp; </span>INIT</div>
+  <nav class="nav-bar">
+    <div class="status-pill"><span class="dot"></span>ONLINE</div>
+    <a href="#produkte" class="nav-link">PRODUKTE</a>
+    <a href="#prozess" class="nav-link">PROZESS</a>
+    <a href="#naehrwerte" class="nav-link">SPECS</a>
+    <a href="#bestellen" class="nav-link">BESTELLEN</a>
+  </nav>
+</header>
 
-<div class="terminal">
-
-  <div class="topbar">
-    <div class="brand">KERNEL<span> &amp; </span>INIT</div>
-    <div class="status"><span class="dot"></span>SYSTEM INITIALIZING</div>
+<div class="hero">
+  <div class="prompt">
+    <span class="pu">root@lenoko</span>:<span class="ph">~</span>$ brew --roast-on-demand --fresh --no-batch-bullshit
   </div>
-
-  <div class="output">
-    <div class="line"><span class="cmd">$</span> git clone https://github.com/lenoko/nerd-coffee</div>
-    <div class="line"><span class="ok">✓</span> Cloning into <span class="arg">'nerd-coffee'</span>... done.</div>
-    <div class="line"><span class="cmd">$</span> ./setup.sh --roast-on-demand --specialty-grade</div>
-    <div class="line"><span class="ok">✓</span> Sourcing green coffee... <span class="arg">Honduras · Peru</span></div>
-    <div class="line"><span class="ok">✓</span> Calibrating roast curves... <span class="arg">KERNEL</span> &amp; <span class="arg">INIT</span> ready</div>
-    <div class="line"><span class="warn">⚠</span> Awaiting final build... <span class="arg">labels in production</span></div>
-    <div class="line"><span class="cmd">$</span> <span class="warn">// launching soon.</span></div>
+  <h1>
+    <span class="h-k">KERNEL</span><br>
+    <span class="h-amp">&amp;</span> <span class="h-i">INIT</span>
+    <span class="h-sub">// specialty coffee. roasted to order. shipped to your desk.</span>
+  </h1>
+  <div class="hero-meta">
+    <span>origin: Linz am Rhein, DE</span>
+    <span>build: specialty grade</span>
+    <span>model: fresh-roast-to-order</span>
+    <span>by LeNoKo Rösterei</span>
   </div>
-
-  <div class="hero">
-    <h1>
-      <span class="h-k">KERNEL</span><br>
-      <span class="h-amp">&amp;</span> <span class="h-i">INIT</span>
-    </h1>
-    <div class="hero-sub">
-      Specialty Coffee · Frisch geröstet auf Bestellung · Linz am Rhein<br>
-      <em>roasted to order</em> · shipped within 48h · <em>no stale beans. ever.</em>
-    </div>
+  <div class="cta-row">
+    <a href="#bestellen" class="btn-primary">$ ./order.sh</a>
+    <a href="#produkte" class="btn-secondary">--list-packages</a>
   </div>
-
-  <div class="progress-wrap">
-    <div class="progress-label">
-      <span>build progress</span>
-      <span id="pct">0%</span>
-    </div>
-    <div class="progress-bar">
-      <div class="progress-fill"></div>
-      <div class="progress-glow"></div>
-    </div>
-  </div>
-
-  <div class="bottom">
-    <div class="info-cell">
-      <div class="info-k">Status</div>
-      <div class="info-v">Work in Progress</div>
-    </div>
-    <div class="info-cell">
-      <div class="info-k">Launch</div>
-      <div class="info-v">bald™</div>
-    </div>
-    <div class="info-cell">
-      <div class="info-k">Kontakt</div>
-      <div class="info-v"><a href="mailto:info@lenoko.de">info@lenoko.de</a></div>
-    </div>
-  </div>
-
-  <div class="notify">
-    <div class="notify-label">Notify me on launch</div>
-    <div class="notify-form">
-      <input type="email" class="notify-input" id="email-input" placeholder="deine@email.dev">
-      <button class="notify-btn" onclick="handleNotify()">$ subscribe</button>
-    </div>
-    <div class="notify-success" id="notify-success">
-      ✓ gespeichert. wir melden uns wenn wir live gehen.
-    </div>
-  </div>
-
 </div>
 
+<div class="specs-bar">
+  <div class="specs-inner">
+    <div class="spec"><div class="spec-k">Röstung</div><div class="spec-v">On Demand</div></div>
+    <div class="spec"><div class="spec-k">Dispatch</div><div class="spec-v">&lt; 48 h</div></div>
+    <div class="spec"><div class="spec-k">Röstbetrieb</div><div class="spec-v">Mo – Fr</div></div>
+    <div class="spec"><div class="spec-k">Versand</div><div class="spec-v">4,99 € / ab 45 € frei, Lieferung innerhalb Deutschlands</div></div>
+    <div class="spec"><div class="spec-k">Bezahlung</div><div class="spec-v">PayPal</div></div>
+    <div class="spec"><div class="spec-k">Mahlgrad</div><div class="spec-v">ganz / gemahlen</div></div>
+    <div class="spec"><div class="spec-k">Liefergebiet</div><div class="spec-v">DE</div></div>
+  </div>
+</div>
+
+<div class="section" id="produkte">
+  <div class="sec-label">packages</div>
+  <div class="sec-title">Zwei <em>Packages</em>. Kein Overhead.</div>
+  <div class="products-grid">
+
+	<div class="product-card card-init">
+      <img class="prod-image" src="mockup_init.png" alt="INIT — Espresso Blend von LeNoKo" loading="lazy">
+      <div class="prod-id">PKG-001 // ESPRESSO_BLEND</div>
+      <div class="prod-name">INIT</div>
+      <div class="prod-pid">// process id: 1. der erste Befehl.</div>
+      <div class="prod-tagline">boot your day.</div>
+      <div class="prod-desc">Kräftiger Espresso-Blend aus der LeNoKo Rösterei. Schokoladig, ausgewogen, mit samtig-dichtem Body. Der Kaffee, den du um 06:00 Uhr willst bevor der erste Pull Request reviewed wird. </div>
+      <div class="prod-attrs">
+        <div class="attr"><div class="attr-k">Röstgrad</div><div class="attr-v">Medium-Dark</div></div>
+        <div class="attr"><div class="attr-k">Profil</div><div class="attr-v">Schokolade · Nuss</div></div>
+        <div class="attr"><div class="attr-k">Zubereitung</div><div class="attr-v">Espresso · Siebträger</div></div>
+        <div class="attr"><div class="attr-k">Herkunft</div><div class="attr-v">Spezialitätenkaffee aus Honduras und Peru (Arabica) und 30% Robusta aus Indien</div></div>
+      </div>
+      <div class="prod-prices">
+        <div class="price-item"><div class="price-size">250 g</div><div class="price-val">9,50 €</div></div>
+        <div class="price-item"><div class="price-size">500 g</div><div class="price-val">16,90 €</div></div>
+        <div class="price-item"><div class="price-size">1 kg</div><div class="price-val">32,90 €</div></div>
+      </div>
+      <div class="prod-cta"><a href="#bestellen" class="btn-order">$ order INIT</a></div>
+    </div>
+	
+	<div class="product-card card-kernel">
+      <img class="prod-image" src="mockup_kernel.png" alt="KERNEL — Kaffeeröstung von LeNoKo" loading="lazy">
+      <div class="prod-id">PKG-002 // MORNING_PROCESS</div>
+      <div class="prod-name">KERNEL</div>
+      <div class="prod-pid">// der Kern. volle Kontrolle.</div>
+      <div class="prod-tagline">full root access.</div>
+      <div class="prod-desc">Die Kaffee-Röstung — heller, zugänglicher, aber kein Kompromiss. Milde Säure, klares Profil, smooth im Abgang. Hoch fehlertoleranter Stack — läuft auf jeder Maschine, von der Filter-Referenz bis zur Aeropress im Home-Office-Setup. Sogar für den Siebträger.</div>
+      <div class="prod-attrs">
+        <div class="attr"><div class="attr-k">Röstgrad</div><div class="attr-v">Medium</div></div>
+        <div class="attr"><div class="attr-k">Profil</div><div class="attr-v">Honig · Schokolade</div></div>
+        <div class="attr"><div class="attr-k">Zubereitung</div><div class="attr-v">Filter · Pourover · Aeropress</div></div>
+        <div class="attr"><div class="attr-k">Herkunft</div><div class="attr-v">Spezialitätenkaffee aus Honduras und Peru (100% Arabica)</div></div>
+      </div>
+      <div class="prod-prices">
+        <div class="price-item"><div class="price-size">250 g</div><div class="price-val">9,50 €</div></div>
+        <div class="price-item"><div class="price-size">500 g</div><div class="price-val">16,90 €</div></div>
+        <div class="price-item"><div class="price-size">1 kg</div><div class="price-val">32,90 €</div></div>
+      </div>
+      <div class="prod-cta"><a href="#bestellen" class="btn-order">$ order KERNEL</a></div>
+    </div>
+
+  </div>
+</div>
+
+<div class="section" id="prozess">
+  <div class="sec-label">how it works</div>
+  <div class="sec-title">Der <em>Stack</em></div>
+  <div class="terminal-block" data-label="lenoko.process.log">
+    <div class="tline"><span class="cmd">INFO</span> <span class="arg">[sourcing]</span>      <span class="cmt">// Rohkaffee direkt vom Erzeuger.</span></div>
+    <div class="tline"><span class="cmd">INFO</span> <span class="arg">[order_received]</span> <span class="cmt">// deine Bestellung triggert den Röstvorgang. kein Lager. kein alter Kaffee.</span></div>
+    <div class="tline"><span class="cmd">INFO</span> <span class="arg">[roasting]</span>      <span class="cmt">// kleine Batches, 2× 3 kW Trommelröster, kurvenüberwacht. Mo – Fr.</span></div>
+    <div class="tline"><span class="cmd">INFO</span> <span class="arg">[degassing]</span>     <span class="cmt">// 24 – 48 h Ruhezeit. CO₂ entweicht, Aromen stabilisieren sich.</span></div>
+    <div class="tline"><span class="cmd">INFO</span> <span class="arg">[dispatch]</span>      <span class="cmt">// versiegelt, beschriftet, übergeben an den Carrier.</span></div>
+    <div class="tline"><span class="cmd">SUCCESS</span> <span class="arg">[delivered]</span>   <span class="cmt">// frischer als jeder Supermarkt-Kaffee. jedes Mal.</span></div>
+  </div>
+  <div class="process-steps">
+    <div class="step"><div class="step-num">01</div><div class="step-title">Order Trigger</div><div class="step-desc">Deine Bestellung startet den Prozess. Kein Lager. Kein altes Zeug. Immer frisch.</div></div>
+    <div class="step"><div class="step-num">02</div><div class="step-title">Fresh Roast</div><div class="step-desc">Geröstet Mo – Fr in Linz am Rhein. Jede Charge manuell kurvenüberwacht.</div></div>
+    <div class="step"><div class="step-num">03</div><div class="step-title">Ship &lt; 48h</div><div class="step-desc">Degassed, versiegelt, auf dem Weg. Versand innerhalb 48 h nach Röstung.</div></div>
+    <div class="step"><div class="step-num">04</div><div class="step-title">Brew &amp; Deploy</div><div class="step-desc">Kaffee kochen. Terminal öffnen. Probleme lösen. So läuft das.</div></div>
+  </div>
+</div>
+
+<!-- NÄHRWERTE -->
+<div class="section" id="naehrwerte">
+  <div class="sec-label">nutritional data</div>
+  <div class="sec-title">Nährwert<em>angaben</em></div>
+  <div class="nutrition-grid">
+
+    <div class="nutrition-card">
+      <div class="nutrition-card-title init-color">
+        <span>INIT</span> // Espresso Blend · 70% Arabica · 30% Robusta
+      </div>
+      <table class="nw-table">
+        <tr class="total-row"><td>Brennwert</td><td>1.062 kJ / 254 kcal</td></tr>
+        <tr><td>Fett</td><td>15 g</td></tr>
+        <tr class="sub"><td>davon gesättigte Fettsäuren</td><td>2 g</td></tr>
+        <tr><td>Kohlenhydrate</td><td>0 g</td></tr>
+        <tr class="sub"><td>davon Zucker</td><td>0 g</td></tr>
+        <tr><td>Ballaststoffe</td><td>0 g</td></tr>
+        <tr><td>Eiweiß</td><td>11 g</td></tr>
+        <tr><td>Salz</td><td>0 g</td></tr>
+      </table>
+      <div class="nw-note">
+        Angaben pro 100 g Röstkaffee (trocken). Das zubereitete Getränk enthält nahezu keine Kalorien.<br>
+        Zutaten: Röstkaffee (70% Arabica aus Honduras &amp; Peru, 30% Robusta aus Indien).
+      </div>
+    </div>
+
+    <div class="nutrition-card">
+      <div class="nutrition-card-title">
+        <span>KERNEL</span> // Kaffeeröstung · 100% Arabica
+      </div>
+      <table class="nw-table">
+        <tr class="total-row"><td>Brennwert</td><td>1.062 kJ / 254 kcal</td></tr>
+        <tr><td>Fett</td><td>15 g</td></tr>
+        <tr class="sub"><td>davon gesättigte Fettsäuren</td><td>2 g</td></tr>
+        <tr><td>Kohlenhydrate</td><td>0 g</td></tr>
+        <tr class="sub"><td>davon Zucker</td><td>0 g</td></tr>
+        <tr><td>Ballaststoffe</td><td>0 g</td></tr>
+        <tr><td>Eiweiß</td><td>11 g</td></tr>
+        <tr><td>Salz</td><td>0 g</td></tr>
+      </table>
+      <div class="nw-note">
+        Angaben pro 100 g Röstkaffee (trocken). Das zubereitete Getränk enthält nahezu keine Kalorien.<br>
+        Zutaten: Röstkaffee (100% Arabica aus Honduras &amp; Peru).
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="checkout-section" id="bestellen">
+  <div class="checkout-inner">
+    <div class="sec-label">checkout</div>
+    <div class="sec-title" style="margin-bottom:2rem">Jetzt <em>bestellen</em></div>
+
+    <div class="steps-indicator">
+      <div class="step-tab active" id="tab-1">01 // Produkt</div>
+      <div class="step-tab"        id="tab-2">02 // Adresse</div>
+      <div class="step-tab"        id="tab-3">03 // Zahlung</div>
+    </div>
+
+    <div class="success-screen" id="success-screen">
+      <h3>Bestellung gestartet.</h3>
+      <p>
+        Deine Bestellung <strong style="color:var(--accent)" id="success-order-id-ref">NERD-XXXX</strong> wurde registriert und du hast die Zahlung über PayPal initiiert.<br>
+        Wir rösten deinen Kaffee frisch nach Zahlungseingang (Mo – Fr).<br>
+        Versand innerhalb 48 h nach Röstung.<br><br>
+        <strong style="color:var(--text)">Hinweis:</strong> Falls du die Order-ID in der PayPal-Notiz vergessen hast, schreibe uns kurz an <a href="mailto:bestellung@lenoko.de" style="color:var(--accent2)">bestellung@lenoko.de</a> mit deiner Order-ID — wir ordnen das dann manuell zu.<br><br>
+        Fragen: <a href="mailto:info@lenoko.de" style="color:var(--accent2)">info@lenoko.de</a>
+        &nbsp;·&nbsp; <a href="https://lenoko.de" style="color:var(--accent2)">lenoko.de</a>
+      </p>
+    </div>
+
+    <!-- STEP 1 -->
+    <div class="form-panel active" id="panel-1">
+      <div class="form-row">
+        <div class="field-group">
+          <label class="field-label">Produkt</label>
+          <select class="field-select" id="f-product" onchange="updatePreview()">
+            <option value="kernel">KERNEL — Espresso Blend</option>
+            <option value="init">INIT — Kaffeeröstung</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Packungsgröße</label>
+          <select class="field-select" id="f-size" onchange="updatePreview()">
+            <option value="250" data-price="9.50">250 g — 9,50 €</option>
+            <option value="500" data-price="16.90">500 g — 16,90 €</option>
+            <option value="1000" data-price="32.90">1 kg — 32,90 €</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field-group">
+          <label class="field-label">Mahlgrad</label>
+          <select class="field-select" id="f-grind">
+            <option>Ganze Bohne</option>
+            <option>Gemahlen — Espresso (fein)</option>
+            <option>Gemahlen — Filter (mittel)</option>
+            <option>Gemahlen — French Press (grob)</option>
+            <option>Gemahlen — Moka Pot</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Anzahl Packungen</label>
+          <select class="field-select" id="f-qty" onchange="updatePreview()">
+            <option value="1">1 Packung</option>
+            <option value="2">2 Packungen</option>
+            <option value="3">3 Packungen</option>
+            <option value="4">4 Packungen</option>
+            <option value="5">5 Packungen</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row full">
+        <div class="field-group">
+          <label class="field-label">Anmerkungen (optional)</label>
+          <input type="text" class="field-input" id="f-note" placeholder="z.B. als Geschenk, besondere Wünsche ...">
+        </div>
+      </div>
+      <div class="price-preview">
+        <div class="pp-label">Produktsumme (exkl. Versand)</div>
+        <div class="pp-val" id="preview-price">9,50 €</div>
+      </div>
+      <div class="form-actions">
+        <span style="font-size:0.6rem;color:var(--muted)">Versand 4,99 € · kostenlos ab 45 € Bestellwert</span>
+        <button class="btn-next" onclick="goStep(2)">Weiter → Adresse</button>
+      </div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="form-panel" id="panel-2">
+      <div class="form-row">
+        <div class="field-group">
+          <label class="field-label">Vorname *</label>
+          <input type="text" class="field-input" id="f-fname" placeholder="Ada">
+          <span class="error-msg" id="err-fname">Pflichtfeld</span>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Nachname *</label>
+          <input type="text" class="field-input" id="f-lname" placeholder="Lovelace">
+          <span class="error-msg" id="err-lname">Pflichtfeld</span>
+        </div>
+      </div>
+      <div class="form-row full">
+        <div class="field-group">
+          <label class="field-label">E-Mail-Adresse *</label>
+          <input type="email" class="field-input" id="f-email" placeholder="ada@example.dev">
+          <span class="error-msg" id="err-email">Bitte gültige E-Mail eingeben</span>
+        </div>
+      </div>
+      <div class="form-row full">
+        <div class="field-group">
+          <label class="field-label">Straße + Hausnummer *</label>
+          <input type="text" class="field-input" id="f-street" placeholder="Musterstraße 42">
+          <span class="error-msg" id="err-street">Pflichtfeld</span>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field-group">
+          <label class="field-label">PLZ *</label>
+          <input type="text" class="field-input" id="f-plz" placeholder="53545" maxlength="10">
+          <span class="error-msg" id="err-plz">Pflichtfeld</span>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Ort *</label>
+          <input type="text" class="field-input" id="f-city" placeholder="Linz am Rhein">
+          <span class="error-msg" id="err-city">Pflichtfeld</span>
+        </div>
+      </div>
+      <div class="form-row full">
+        <div class="field-group">
+          <label class="field-label">Land</label>
+          <select class="field-select" id="f-country">
+            <option>Deutschland</option>
+            <option>Österreich</option>
+            <option>Schweiz</option>
+            <option>Luxemburg</option>
+            <option>Belgien</option>
+            <option>Niederlande</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn-back" onclick="goStep(1)">← Zurück</button>
+        <button class="btn-next" onclick="goStep(3)">Weiter → Zahlung</button>
+      </div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div class="form-panel" id="panel-3">
+      <div class="summary-block">
+        <div class="summary-title">// order.summary</div>
+        <div class="summary-row"><span class="s-key">Produkt</span><span class="s-val" id="sum-product">—</span></div>
+        <div class="summary-row"><span class="s-key">Packungsgröße</span><span class="s-val" id="sum-size">—</span></div>
+        <div class="summary-row"><span class="s-key">Anzahl</span><span class="s-val" id="sum-qty">—</span></div>
+        <div class="summary-row"><span class="s-key">Mahlgrad</span><span class="s-val" id="sum-grind">—</span></div>
+        <div class="summary-row"><span class="s-key">Lieferung an</span><span class="s-val" id="sum-address">—</span></div>
+        <div class="summary-row"><span class="s-key">E-Mail</span><span class="s-val" id="sum-email">—</span></div>
+        <div class="summary-row"><span class="s-key">Versandkosten</span><span class="s-val" id="sum-shipping">—</span></div>
+        <div class="summary-row total"><span class="s-key">Gesamt inkl. MwSt.</span><span class="s-val" id="sum-total">—</span></div>
+      </div>
+
+      <div class="widerruf-box">
+        <input type="checkbox" id="widerruf-check">
+        <div>
+          <div class="widerruf-text">
+            Ich habe die <a href="agb.html" target="_blank">AGB</a>, die <a href="datenschutz.html" target="_blank">Datenschutzerklärung</a> und die <a href="widerruf.html" target="_blank">Widerrufsbelehrung</a> gelesen und akzeptiere diese. Mir ist bekannt, dass mein gesetzliches Widerrufsrecht bei versiegelten Lebensmitteln gemäß <strong>§ 312g Abs. 2 Nr. 3 BGB</strong> erlischt, sobald die Hygiene-Versiegelung der Kaffeeverpackung nach der Lieferung entfernt wurde.
+          </div>
+          <div class="widerruf-err" id="widerruf-err">Bitte bestätige AGB, Datenschutz und Widerrufsbelehrung, um fortzufahren.</div>
+        </div>
+      </div>
+
+      <!-- PRE-PAYPAL: Erste Ansicht mit "Bestellung registrieren"-Button -->
+      <div id="pre-paypal-area">
+        <!-- Honeypot — versteckt für menschliche Nutzer, Bots füllen es aus -->
+        <div style="position:absolute;left:-10000px;top:auto;width:1px;height:1px;overflow:hidden;" aria-hidden="true">
+          <label>Website (bitte leer lassen): <input type="text" id="f-hp" name="website" tabindex="-1" autocomplete="off"></label>
+        </div>
+
+        <button class="btn-paypal" id="btn-register" onclick="registerOrder()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M7.5 21L9 3h8.5c2.5 0 4 1.5 3.5 4.5C20.5 11 18 12.5 15 12.5H12L11 21H7.5Z" fill="#003087"/>
+            <path d="M4 21l1.5-18H14c2.5 0 4 1.5 3.5 4.5C17 11 14.5 12.5 11.5 12.5H8.5L7.5 21H4Z" fill="#009cde"/>
+          </svg>
+          <span id="btn-register-label">Bestellung registrieren &amp; zu PayPal</span>
+        </button>
+        <div class="paypal-note">
+          Deine Bestelldaten werden direkt an unsere Rösterei in Linz am Rhein übermittelt.<br>
+          Du erhältst eine <strong style="color:var(--text)">Order-ID</strong>, die du in der PayPal-Notiz einfügen solltest, damit deine Zahlung zugeordnet werden kann.<br>
+          <a href="https://lenoko.de">lenoko.de</a> &nbsp;·&nbsp; <a href="mailto:info@lenoko.de">info@lenoko.de</a>
+        </div>
+
+        <!-- HARTER FEHLER: Validierung schlug fehl, oder beide Pfade tot -->
+        <div class="widerruf-err" id="register-err" style="margin-top:1rem;display:none;">Registrierung fehlgeschlagen. Bitte kurz erneut versuchen oder schreibe uns an <a href="mailto:bestellung@lenoko.de" style="color:var(--accent2)">bestellung@lenoko.de</a>.</div>
+
+        <!-- FALLBACK-BANNER: Pi nicht erreichbar, Kunde kann Drittland-Pfad wählen -->
+        <div id="fallback-banner" style="display:none;margin-top:1.2rem;background:var(--bg);border:1px solid var(--accent);border-left:3px solid var(--accent);padding:1rem 1.2rem;font-family:'Space Grotesk',sans-serif;font-size:0.78rem;color:var(--text);line-height:1.65;">
+          <div style="color:var(--accent);font-weight:700;margin-bottom:0.5rem;letter-spacing:0.05em;">// BESTELLANNAHME GERADE NICHT ERREICHBAR</div>
+          <p style="margin-bottom:0.7rem;">Unser direkter Annahme-Server (in Deutschland) antwortet gerade nicht. Du hast zwei Möglichkeiten:</p>
+          <p style="margin-bottom:0.7rem;"><strong>A)</strong> In ein paar Minuten erneut versuchen. Bei kurzzeitigen Ausfällen ist das meist nach wenigen Minuten wieder erreichbar.</p>
+          <p style="margin-bottom:0.7rem;"><strong>B)</strong> Notfall-Pfad nutzen: Deine Bestelldaten werden über den Dienst <strong>FormSubmit (USA)</strong> an unsere E-Mail weitergeleitet. Dabei kommt es zu einer Datenübermittlung in ein Drittland ohne EU-Angemessenheitsbeschluss. Mit dem Klick unten willigst du in diese einmalige Übermittlung gemäß <strong>Art. 49 Abs. 1 lit. a DSGVO</strong> ein.</p>
+          <div style="display:flex;gap:0.7rem;margin-top:1rem;flex-wrap:wrap;">
+            <button onclick="useFallbackPath()" style="background:var(--accent);color:var(--bg);border:none;padding:0.55rem 1rem;font-family:'JetBrains Mono',monospace;font-size:0.65rem;font-weight:700;letter-spacing:0.08em;cursor:pointer;text-transform:uppercase;">B) Notfall-Pfad nutzen &amp; Drittland-Übermittlung zustimmen</button>
+            <button onclick="cancelFallback()" style="background:transparent;color:var(--muted);border:1px solid var(--border);padding:0.55rem 1rem;font-family:'JetBrains Mono',monospace;font-size:0.65rem;font-weight:700;letter-spacing:0.08em;cursor:pointer;text-transform:uppercase;">A) Später erneut versuchen</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ORDER-ID-AREA: Nach erfolgreicher Registrierung sichtbar -->
+      <div id="order-id-area" style="display:none;">
+        <div class="order-id-box">
+          <div class="order-id-label">// DEINE ORDER-ID</div>
+          <div class="order-id-value" id="order-id-display">NERD-XXXX</div>
+          <button class="order-id-copy" id="order-id-copy-btn" onclick="copyOrderId()" type="button">📋 ID KOPIEREN</button>
+        </div>
+
+        <div class="order-id-warn">
+          <span class="order-id-warn-icon">⚠</span>
+          <div>
+            <strong>WICHTIG:</strong> Füge diese Order-ID bei PayPal im <strong>Notiz-Feld</strong> ein, damit wir deine Zahlung deiner Bestellung zuordnen können. Ohne Order-ID kann die Zuordnung sich verzögern.
+          </div>
+        </div>
+
+        <div class="step-instructions">
+          <ol>
+            <li>Order-ID oben <strong>kopieren</strong> (Button drücken)</li>
+            <li>Auf <strong>„Weiter zu PayPal"</strong> klicken — es öffnet sich ein neuer Tab</li>
+            <li>Bei PayPal im Notiz-Feld <strong>Order-ID einfügen</strong> (STRG+V)</li>
+            <li>Zahlung abschließen — fertig. Du bekommst von uns in Kürze eine Bestätigung per E-Mail.</li>
+          </ol>
+        </div>
+
+        <button class="btn-paypal" onclick="proceedToPayPal()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M7.5 21L9 3h8.5c2.5 0 4 1.5 3.5 4.5C20.5 11 18 12.5 15 12.5H12L11 21H7.5Z" fill="#003087"/>
+            <path d="M4 21l1.5-18H14c2.5 0 4 1.5 3.5 4.5C17 11 14.5 12.5 11.5 12.5H8.5L7.5 21H4Z" fill="#009cde"/>
+          </svg>
+          Weiter zu PayPal (<span id="order-amount">0,00 €</span>)
+        </button>
+      </div>
+
+      <div class="form-actions" style="border-top:none;padding-top:0;margin-top:1.5rem;">
+        <button class="btn-back" onclick="goStep(2)">← Zurück</button>
+        <span></span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="legal-band">
+  <span>LeNoKo Rösterei · Linz am Rhein</span>
+  <a href="impressum.html">Impressum</a>
+  <a href="agb.html">AGB</a>
+  <a href="datenschutz.html">Datenschutz</a>
+  <a href="widerruf.html">Widerrufsbelehrung</a>
+</div>
+
+<footer>
+  <div><span class="footer-brand">KERNEL &amp; INIT</span> — specialty coffee by <a href="https://lenoko.de">LeNoKo Rösterei</a>, Linz am Rhein</div>
+  <div>© 2026 LeNoKo</div>
+</footer>
+
 <script>
-  // Animate progress percentage counter
-  const pctEl = document.getElementById('pct');
-  let current = 0;
-  const target = 78;
-  const start = 4200; // matches animation delay
+  // ── KONFIG ─────────────────────────────────────────────────────
+  const PAYPAL_ME = 'https://paypal.me/LeNoKoDE';
 
-  setTimeout(() => {
-    const interval = setInterval(() => {
-      current++;
-      pctEl.textContent = current + '%';
-      if (current >= target) clearInterval(interval);
-    }, 2000 / target);
-  }, start);
+  // PRIMÄR: eigener Pi-Endpoint (DSGVO-konform, EU/Hardware in DE).
+  // Caddy ergänzt serverseitig den AppDaemon-Bearer-Token,
+  // im Frontend lebt nur das zweite-Schicht-Secret.
+  const PI_ENDPOINT_URL    = 'https://order.lenoko.de/api/v1/order';
+  const PI_ENDPOINT_SECRET = "UHWq7PaTTqBBQ54i6rvtFB_s7j7Gf_N5";
 
-  // Email notify — stores in mailto for now
-  function handleNotify() {
-    const email = document.getElementById('email-input').value.trim();
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      document.getElementById('email-input').style.borderBottom = '1px solid #ff3366';
-      return;
-    }
-    // Opens a pre-filled mailto so you receive the address
-    window.location.href = 'mailto:info@lenoko.de?subject=Launch Notification&body=Bitte benachrichtigt mich wenn KERNEL %26 INIT live geht: ' + encodeURIComponent(email);
-    document.getElementById('notify-success').style.display = 'block';
-    document.getElementById('email-input').value = '';
+  const PI_ENDPOINT_TIMEOUT_MS = 8000;                   // 8 s, dann Fallback anbieten
+
+  // FALLBACK: FormSubmit (USA). Wird nur genutzt, wenn der Pi-Endpoint
+  // nicht erreichbar ist UND der Kunde explizit der Drittland-
+  // übermittlung zustimmt (Art. 49 Abs. 1 lit. a DSGVO).
+  const FORMSUBMIT_URL = 'https://formsubmit.co/ajax/43fb7ee24183f58b5d25242c3e6644fb';
+  // ───────────────────────────────────────────────────────────────
+
+  const PRICES = { '250': 9.50, '500': 16.90, '1000': 32.90 };
+  const SHIP_FLAT = 4.99;
+  const SHIP_FREE = 45;
+
+  function fmt(n) { return n.toFixed(2).replace('.', ',') + ' €'; }
+
+  function getOrder() {
+    const prod  = document.getElementById('f-product').value;
+    const size  = document.getElementById('f-size').value;
+    const qty   = parseInt(document.getElementById('f-qty').value);
+    const grind = document.getElementById('f-grind').value;
+    const note  = document.getElementById('f-note').value.trim();
+    const unit  = PRICES[size];
+    const sub   = unit * qty;
+    const ship  = sub >= SHIP_FREE ? 0 : SHIP_FLAT;
+    return {
+      productName: prod === 'kernel' ? 'KERNEL (Espresso Blend)' : 'INIT (Kaffeeröstung)',
+      size, qty, grind, note, unit, sub, ship,
+      total: sub + ship,
+      fname:   document.getElementById('f-fname')?.value  || '',
+      lname:   document.getElementById('f-lname')?.value  || '',
+      email:   document.getElementById('f-email')?.value  || '',
+      street:  document.getElementById('f-street')?.value || '',
+      plz:     document.getElementById('f-plz')?.value    || '',
+      city:    document.getElementById('f-city')?.value   || '',
+      country: document.getElementById('f-country')?.value|| '',
+    };
   }
 
-  // Enter key on input
-  document.getElementById('email-input').addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') handleNotify();
+  function updatePreview() {
+    const o = getOrder();
+    document.getElementById('preview-price').textContent = fmt(o.sub);
+  }
+
+  function buildSummary() {
+    const o = getOrder();
+    const sizeLabel = o.size === '1000' ? '1 kg' : o.size + ' g';
+    document.getElementById('sum-product').textContent  = o.productName;
+    document.getElementById('sum-size').textContent     = sizeLabel;
+    document.getElementById('sum-qty').textContent      = o.qty + '× Packung' + (o.qty > 1 ? 'en' : '');
+    document.getElementById('sum-grind').textContent    = o.grind;
+    document.getElementById('sum-address').textContent  = `${o.fname} ${o.lname}, ${o.street}, ${o.plz} ${o.city}, ${o.country}`;
+    document.getElementById('sum-email').textContent    = o.email;
+    document.getElementById('sum-shipping').textContent = o.ship === 0 ? 'kostenlos (ab 45 €)' : fmt(o.ship);
+    document.getElementById('sum-total').textContent    = fmt(o.total);
+  }
+
+  function goStep(step) {
+    if (step === 3 && !validateAddr()) return;
+    document.querySelectorAll('.form-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.step-tab').forEach((t, i) => {
+      t.classList.remove('active', 'done');
+      if (i + 1 < step) t.classList.add('done');
+    });
+    document.getElementById('panel-' + step).classList.add('active');
+    document.getElementById('tab-'   + step).classList.add('active');
+    if (step === 3) buildSummary();
+    document.getElementById('bestellen').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function validateAddr() {
+    const fields = [
+      { id:'f-fname', err:'err-fname' },
+      { id:'f-lname', err:'err-lname' },
+      { id:'f-street',err:'err-street' },
+      { id:'f-plz',   err:'err-plz' },
+      { id:'f-city',  err:'err-city' },
+    ];
+    let ok = true;
+    fields.forEach(({ id, err }) => {
+      const el = document.getElementById(id);
+      const em = document.getElementById(err);
+      if (!el.value.trim()) { el.classList.add('error'); em.style.display='block'; ok=false; }
+      else { el.classList.remove('error'); em.style.display='none'; }
+    });
+    const mail = document.getElementById('f-email');
+    const mErr = document.getElementById('err-email');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail.value)) {
+      mail.classList.add('error'); mErr.style.display='block'; ok=false;
+    } else { mail.classList.remove('error'); mErr.style.display='none'; }
+    return ok;
+  }
+
+  // ── ORDER-ID-FLOW ─────────────────────────────────────────────
+  // PRIMÄR: Pi-Endpoint nimmt Bestellung direkt entgegen, schreibt sie in
+  //         /share/lenoko/pending_orders.json. PayPal-Sync matched später
+  //         gegen die eintreffende Zahlung per Order-ID.
+  // FALLBACK: Wenn der Pi-Endpoint nicht erreichbar ist (Stromausfall,
+  //         Internet-Ausfall, Wartung), wird ein Banner gezeigt. Bei
+  //         expliziter Drittland-Einwilligung des Kunden geht die
+  //         Bestellung über FormSubmit als E-Mail an bestellung@lenoko.de
+  //         und wird dort vom alten FormSubmit-Parser aufgelesen.
+
+  // Ambiguous-free Alphabet (kein 0/O, 1/I/L)
+  const OID_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+  function generateOrderId() {
+    let s = '';
+    const arr = new Uint8Array(4);
+    (window.crypto || window.msCrypto).getRandomValues(arr);
+    for (let i = 0; i < 4; i++) s += OID_ALPHABET[arr[i] % OID_ALPHABET.length];
+    return 'NERD-' + s;
+  }
+
+  let CURRENT_ORDER  = null;   // gehalten zwischen registerOrder() und proceedToPayPal()
+  let PENDING_ORDER  = null;   // Bestelldaten für evtl. Fallback-Versuch
+
+  async function registerOrder() {
+    // Schritt 1 — AGB/Datenschutz/Widerruf checken
+    if (!document.getElementById('widerruf-check').checked) {
+      document.getElementById('widerruf-err').style.display = 'block';
+      return;
+    }
+    document.getElementById('widerruf-err').style.display = 'none';
+    document.getElementById('register-err').style.display = 'none';
+    document.getElementById('fallback-banner').style.display = 'none';
+
+    const btn = document.getElementById('btn-register');
+    const btnLabel = document.getElementById('btn-register-label');
+    const originalLabel = btnLabel.textContent;
+    btn.disabled = true;
+    btnLabel.textContent = 'Registriere Bestellung…';
+
+    const o = getOrder();
+    const orderId = generateOrderId();
+    const sizeLabel = o.size === '1000' ? '1kg' : o.size + 'g';
+    const honeypot  = document.getElementById('f-hp')?.value || '';
+
+    // Daten für Pi-Endpoint (Pflichtfelder + _secret + Honeypot)
+    const piPayload = {
+      _secret:  PI_ENDPOINT_SECRET,
+      _hp:      honeypot,
+      order_id: orderId,
+      produkt:  o.productName.startsWith('KERNEL') ? 'KERNEL' : 'INIT',
+      size:     o.size === '1000' ? '1kg' : o.size + 'g',
+      qty:      o.qty,
+      grind:    o.grind,
+      note:     o.note,
+      fname:    o.fname,
+      lname:    o.lname,
+      street:   o.street,
+      plz:      o.plz,
+      city:     o.city,
+      email:    o.email,
+      betrag:   o.total
+    };
+
+    // Bestelldaten für evtl. Fallback parken
+    PENDING_ORDER = { o, orderId, sizeLabel, btn, btnLabel, originalLabel };
+
+    try {
+      const resp = await fetchWithTimeout(PI_ENDPOINT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify(piPayload)
+      }, PI_ENDPOINT_TIMEOUT_MS);
+
+      console.log('[registerOrder/pi] status:', resp.status);
+      const data = await resp.json().catch(() => ({}));
+      console.log('[registerOrder/pi] response:', data);
+
+      if (resp.ok && data.ok) {
+        showSuccessAndProceedToPayPal(orderId, o.total);
+        return;
+      }
+
+      // Pi hat geantwortet, aber inhaltlich abgelehnt -> User-Feedback
+      if (resp.status === 409) {
+        // duplicate_order_id — extrem unwahrscheinlich, neue ID generieren und retry
+        console.warn('[registerOrder/pi] duplicate -> retry mit neuer ID');
+        PENDING_ORDER = null;
+        btn.disabled = false;
+        btnLabel.textContent = originalLabel;
+        return registerOrder();
+      }
+      if (resp.status === 400) {
+        document.getElementById('register-err').style.display = 'block';
+        document.getElementById('register-err').innerHTML =
+          'Bestelldaten unvollständig oder ungültig (' + (data.error || '?') +
+          '). Bitte prüfe die Felder oder schreibe an ' +
+          '<a href="mailto:bestellung@lenoko.de" style="color:var(--accent2)">bestellung@lenoko.de</a>.';
+        btn.disabled = false;
+        btnLabel.textContent = originalLabel;
+        return;
+      }
+      // 401/503/5xx -> Fallback anbieten
+      throw new Error('pi_endpoint_status_' + resp.status);
+
+    } catch (err) {
+      console.warn('[registerOrder/pi] nicht erreichbar:', err);
+      // Pi nicht erreichbar -> Fallback-Banner zeigen
+      btn.disabled = false;
+      btnLabel.textContent = originalLabel;
+      document.getElementById('fallback-banner').style.display = 'block';
+      document.getElementById('fallback-banner').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }
+
+  // ── FALLBACK-PFAD (FormSubmit) ─────────────────────────────────
+  async function useFallbackPath() {
+    if (!PENDING_ORDER) return;
+    const { o, orderId, sizeLabel, btn, btnLabel, originalLabel } = PENDING_ORDER;
+    const honeypot = document.getElementById('f-hp')?.value || '';
+
+    document.getElementById('fallback-banner').style.display = 'none';
+    document.getElementById('register-err').style.display = 'none';
+    btn.disabled = true;
+    btnLabel.textContent = 'Sende über Notfall-Pfad…';
+
+    // Drittland-Einwilligung als eigenes Feld dokumentieren
+    const consentTs = new Date().toISOString();
+
+    const fsPayload = {
+      _subject:  `Neue Bestellung ${orderId} — ${o.productName} (FALLBACK)`,
+      _template: 'table',
+      _captcha:  'false',
+      order_id:  orderId,
+      produkt:   o.productName,
+      size:      o.size,
+      qty:       String(o.qty),
+      grind:     o.grind,
+      note:      o.note,
+      fname:     o.fname,
+      lname:     o.lname,
+      street:    o.street,
+      plz:       o.plz,
+      city:      o.city,
+      country:   o.country,
+      email:     o.email,
+      betrag:    o.total.toFixed(2),
+      zusammenfassung: `${o.productName} · ${sizeLabel} · ${o.qty}x · ${o.grind} · ${fmt(o.total)}`,
+      _hp:       honeypot,
+      consent_drittland: 'true',
+      consent_drittland_basis: 'Art. 49 Abs. 1 lit. a DSGVO',
+      consent_drittland_zeitpunkt: consentTs,
+      flow: 'fallback_after_pi_fail'
+    };
+
+    const fd = new FormData();
+    Object.entries(fsPayload).forEach(([k, v]) => fd.append(k, v == null ? '' : String(v)));
+
+    try {
+      const resp = await fetch(FORMSUBMIT_URL, {
+        method: 'POST',
+        headers: { 'Accept': 'application/json' },
+        body: fd
+      });
+      console.log('[registerOrder/fallback] status:', resp.status);
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      const data = await resp.json().catch(() => ({}));
+      console.log('[registerOrder/fallback] response:', data);
+
+      showSuccessAndProceedToPayPal(orderId, o.total);
+    } catch (err) {
+      console.error('[registerOrder/fallback] failed:', err);
+      document.getElementById('register-err').style.display = 'block';
+      document.getElementById('register-err').innerHTML =
+        'Auch der Notfall-Pfad ist gerade nicht erreichbar. Bitte schreibe uns an ' +
+        '<a href="mailto:bestellung@lenoko.de" style="color:var(--accent2)">bestellung@lenoko.de</a> ' +
+        '— wir tragen deine Bestellung dann manuell ein.';
+      btn.disabled = false;
+      btnLabel.textContent = originalLabel;
+    }
+  }
+
+  function cancelFallback() {
+    document.getElementById('fallback-banner').style.display = 'none';
+    PENDING_ORDER = null;
+  }
+
+  function showSuccessAndProceedToPayPal(orderId, total) {
+    CURRENT_ORDER = { orderId, total };
+    PENDING_ORDER = null;
+    document.getElementById('order-id-display').textContent = orderId;
+    document.getElementById('order-amount').textContent = fmt(total);
+    document.getElementById('pre-paypal-area').style.display = 'none';
+    document.getElementById('order-id-area').style.display = 'block';
+    document.getElementById('order-id-area').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // fetch mit Timeout — Browsern fehlt das nativ
+  function fetchWithTimeout(url, options, timeoutMs) {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+    return fetch(url, { ...options, signal: ctrl.signal })
+      .finally(() => clearTimeout(timer));
+  }
+
+  function copyOrderId() {
+    if (!CURRENT_ORDER) return;
+    const btn = document.getElementById('order-id-copy-btn');
+    const originalText = btn.textContent;
+    const done = () => {
+      btn.textContent = '✓ KOPIERT';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = originalText; btn.classList.remove('copied'); }, 2000);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(CURRENT_ORDER.orderId).then(done).catch(() => {
+        // Fallback
+        const ta = document.createElement('textarea');
+        ta.value = CURRENT_ORDER.orderId;
+        document.body.appendChild(ta); ta.select();
+        try { document.execCommand('copy'); done(); } catch (e) {}
+        document.body.removeChild(ta);
+      });
+    } else {
+      const ta = document.createElement('textarea');
+      ta.value = CURRENT_ORDER.orderId;
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); done(); } catch (e) {}
+      document.body.removeChild(ta);
+    }
+  }
+
+  function proceedToPayPal() {
+    if (!CURRENT_ORDER) return;
+    const note = encodeURIComponent(CURRENT_ORDER.orderId);
+    window.open(`${PAYPAL_ME}/${CURRENT_ORDER.total.toFixed(2)}EUR?note=${note}`, '_blank');
+    document.getElementById('success-order-id-ref').textContent = CURRENT_ORDER.orderId;
+    document.querySelectorAll('.form-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.step-tab').forEach(t => { t.classList.remove('active'); t.classList.add('done'); });
+    document.getElementById('success-screen').style.display = 'block';
+    document.getElementById('success-screen').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      document.querySelector(a.getAttribute('href'))?.scrollIntoView({ behavior:'smooth' });
+    });
   });
 </script>
-
 </body>
 </html>
