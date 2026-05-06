@@ -4,6 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>KERNEL & INIT — Specialty Coffee by LeNoKo</title>
+
+<!-- Favicons & PWA -->
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="icon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="icon-16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0a0c0f">
+<meta name="apple-mobile-web-app-title" content="KERNEL & INIT">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;800&family=Space+Grotesk:wght@300;400;600&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -478,8 +490,8 @@
         <div class="field-group">
           <label class="field-label">Produkt</label>
           <select class="field-select" id="f-product" onchange="updatePreview()">
-            <option value="kernel">KERNEL — Espresso Blend</option>
-            <option value="init">INIT — Kaffeeröstung</option>
+            <option value="kernel">KERNEL — Kaffeeröstung</option>
+            <option value="init">INIT — Espresso Blend</option>
           </select>
         </div>
         <div class="field-group">
@@ -737,7 +749,7 @@
     const sub   = unit * qty;
     const ship  = sub >= SHIP_FREE ? 0 : SHIP_FLAT;
     return {
-      productName: prod === 'kernel' ? 'KERNEL (Espresso Blend)' : 'INIT (Kaffeeröstung)',
+      productName: prod === 'kernel' ? 'KERNEL (Kaffeeröstung)' : 'INIT (Espresso Blend)',
       size, qty, grind, note, unit, sub, ship,
       total: sub + ship,
       fname:   document.getElementById('f-fname')?.value  || '',
