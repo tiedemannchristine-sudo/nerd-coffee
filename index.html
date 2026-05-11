@@ -366,9 +366,9 @@
         <div class="price-item"><div class="price-size">500 g</div><div class="price-val">16,90 €</div></div>
         <div class="price-item"><div class="price-size">1 kg</div><div class="price-val">32,90 €</div></div>
       </div>
-      <div class="prod-cta"><a href="#bestellen" class="btn-order">$ order INIT</a></div>
+      <div class="prod-cta"><a href="#bestellen" class="btn-order" onclick="preselectProduct('init')">$ order INIT</a></div>
     </div>
-	
+
 	<div class="product-card card-kernel">
       <img class="prod-image" src="mockup_kernel.png" alt="KERNEL — Kaffeeröstung von LeNoKo" loading="lazy">
       <div class="prod-id">PKG-002 // MORNING_PROCESS</div>
@@ -387,7 +387,7 @@
         <div class="price-item"><div class="price-size">500 g</div><div class="price-val">16,90 €</div></div>
         <div class="price-item"><div class="price-size">1 kg</div><div class="price-val">32,90 €</div></div>
       </div>
-      <div class="prod-cta"><a href="#bestellen" class="btn-order">$ order KERNEL</a></div>
+      <div class="prod-cta"><a href="#bestellen" class="btn-order" onclick="preselectProduct('kernel')">$ order KERNEL</a></div>
     </div>
 
   </div>
@@ -663,25 +663,17 @@
       <!-- ORDER-ID-AREA: Nach erfolgreicher Registrierung sichtbar -->
       <div id="order-id-area" style="display:none;">
         <div class="order-id-box">
-          <div class="order-id-label">// DEINE ORDER-ID</div>
+          <div class="order-id-label">// BESTELLUNG REGISTRIERT</div>
           <div class="order-id-value" id="order-id-display">NERD-XXXX</div>
-          <button class="order-id-copy" id="order-id-copy-btn" onclick="copyOrderId()" type="button">📋 ID KOPIEREN</button>
-        </div>
-
-        <div class="order-id-warn">
-          <span class="order-id-warn-icon">⚠</span>
-          <div>
-            <strong>WICHTIG:</strong> Füge diese Order-ID bei PayPal im <strong>Notiz-Feld</strong> ein, damit wir deine Zahlung deiner Bestellung zuordnen können. Ohne Order-ID kann die Zuordnung sich verzögern.
-          </div>
         </div>
 
         <div class="step-instructions">
-          <ol>
-            <li>Order-ID oben <strong>kopieren</strong> (Button drücken)</li>
-            <li>Auf <strong>„Weiter zu PayPal"</strong> klicken — es öffnet sich ein neuer Tab</li>
-            <li>Bei PayPal im Notiz-Feld <strong>Order-ID einfügen</strong> (STRG+V)</li>
-            <li>Zahlung abschließen — fertig. Du bekommst von uns in Kürze eine Bestätigung per E-Mail.</li>
-          </ol>
+          <p style="font-family:'Space Grotesk',sans-serif;font-size:0.85rem;line-height:1.65;color:var(--text);">
+            Deine Bestellung wurde bei uns registriert. Klick jetzt unten auf <strong>„Weiter zu PayPal"</strong>, um die Zahlung abzuschließen. Betrag und Bestell-Nummer sind in der PayPal-Maske bereits vorausgefüllt — du musst nichts mehr manuell eintragen.
+          </p>
+          <p style="font-family:'Space Grotesk',sans-serif;font-size:0.85rem;line-height:1.65;color:var(--text);margin-top:0.8rem;">
+            Nach erfolgreicher Zahlung bekommst du in Kürze eine Bestellbestätigung per E-Mail.
+          </p>
         </div>
 
         <button class="btn-paypal" onclick="proceedToPayPal()">
@@ -769,6 +761,18 @@
   function updatePreview() {
     const o = getOrder();
     document.getElementById('preview-price').textContent = fmt(o.sub);
+  }
+
+  // Wird von den "$ order KERNEL" / "$ order INIT" Buttons aufgerufen
+  // und setzt das Produkt-Dropdown vorab, damit der Kunde nicht
+  // nochmal manuell auswaehlen muss.
+  function preselectProduct(value) {
+    const sel = document.getElementById('f-product');
+    if (sel) {
+      sel.value = value;
+      sel.dispatchEvent(new Event('change'));
+      updatePreview();
+    }
   }
 
   function buildSummary() {
