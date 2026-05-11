@@ -717,7 +717,11 @@
 
 <script>
   // ── KONFIG ─────────────────────────────────────────────────────
-  const PAYPAL_ME = 'https://paypal.me/LeNoKoDE';
+  // paypal.me funktioniert im Browser, die Mobile-App ignoriert aber
+  // Betrag/Notiz nach dem Account. Deshalb gehen wir ueber die klassische
+  // _xclick-Checkout-URL, die auf Desktop UND Mobile den Betrag, die
+  // Item-Beschreibung und die Order-ID korrekt uebernimmt.
+  const PAYPAL_BUSINESS = 'lenokofood@gmx.de';   // Empfaenger-Email des PayPal-Kontos
 
   // PRIMÄR: eigener Pi-Endpoint (DSGVO-konform, EU/Hardware in DE).
   // Caddy ergänzt serverseitig den AppDaemon-Bearer-Token,
@@ -1049,8 +1053,20 @@
 
   function proceedToPayPal() {
     if (!CURRENT_ORDER) return;
-    const note = encodeURIComponent(CURRENT_ORDER.orderId);
-    window.open(`${PAYPAL_ME}/${CURRENT_ORDER.total.toFixed(2)}EUR?note=${note}`, '_blank');
+    const params = new URLSearchParams({
+      cmd:            '_xclick',
+      business:       PAYPAL_BUSINESS,
+      item_name:      `KERNEL & INIT — ${CURRENT_ORDER.orderId}`,
+      item_number:    CURRENT_ORDER.orderId,
+      amount:         CURRENT_ORDER.total.toFixed(2),
+      currency_code:  'EUR',
+      custom:         CURRENT_ORDER.orderId,
+      no_shipping:    '1',
+      lc:             'DE',
+      return:         'https://nerd.lenoko.de/?payment=ok',
+      cancel_return:  'https://nerd.lenoko.de/?payment=cancel'
+    });
+    window.open(`https://www.paypal.com/cgi-bin/webscr?${params.toString()}`, '_blank');
     document.getElementById('success-order-id-ref').textContent = CURRENT_ORDER.orderId;
     document.querySelectorAll('.form-panel').forEach(p => p.classList.remove('active'));
     document.querySelectorAll('.step-tab').forEach(t => { t.classList.remove('active'); t.classList.add('done'); });
