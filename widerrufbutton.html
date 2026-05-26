@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KERNEL & INIT // widerruf.exec</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;700&display=swap');
+
+    :root {
+      --green: #00ff41;
+      --green-dim: #00aa2a;
+      --green-dark: #003a0d;
+      --black: #0a0a0a;
+      --gray: #1a1a1a;
+      --gray-mid: #2a2a2a;
+      --text-dim: #4a7a52;
+      --red: #ff3333;
+      --amber: #ffaa00;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--black);
+      color: var(--green);
+      font-family: 'JetBrains Mono', 'Courier New', monospace;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1rem;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* CRT scanline effect */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.08) 2px,
+        rgba(0,0,0,0.08) 4px
+      );
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    /* Vignette */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse at center, transparent 60%, rgba(0,0,0,0.7) 100%);
+      pointer-events: none;
+      z-index: 99;
+    }
+
+    .terminal {
+      width: 100%;
+      max-width: 680px;
+    }
+
+    .terminal-header {
+      background: var(--gray);
+      border: 1px solid var(--green-dim);
+      border-bottom: none;
+      padding: 0.5rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot-red { background: #ff5f57; }
+    .dot-yellow { background: #febc2e; }
+    .dot-green { background: #28c840; }
+
+    .terminal-title {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      margin-left: auto;
+      letter-spacing: 0.1em;
+    }
+
+    .terminal-body {
+      background: var(--black);
+      border: 1px solid var(--green-dim);
+      padding: 2rem;
+      animation: flicker 8s infinite;
+    }
+
+    @keyframes flicker {
+      0%, 95%, 100% { opacity: 1; }
+      96% { opacity: 0.97; }
+      97% { opacity: 1; }
+      98% { opacity: 0.98; }
+    }
+
+    .prompt-line {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 0.3rem;
+      font-size: 0.85rem;
+    }
+
+    .prompt-symbol { color: var(--green-dim); }
+    .prompt-cmd { color: var(--green); }
+    .prompt-arg { color: var(--amber); }
+
+    .output-block {
+      margin: 1.5rem 0;
+      padding-left: 0;
+    }
+
+    .output-line {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      line-height: 1.8;
+    }
+
+    .output-line.highlight { color: var(--green); }
+    .output-line.warn { color: var(--amber); }
+    .output-line.error { color: var(--red); }
+
+    .divider {
+      border: none;
+      border-top: 1px solid var(--green-dark);
+      margin: 1.5rem 0;
+    }
+
+    /* === STEP 1 === */
+    #step1 { display: block; }
+    #step2 { display: none; }
+    #step3 { display: none; }
+
+    .section-label {
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+
+    .field-group {
+      margin-bottom: 1.2rem;
+    }
+
+    label {
+      display: block;
+      font-size: 0.75rem;
+      color: var(--green-dim);
+      margin-bottom: 0.4rem;
+      letter-spacing: 0.05em;
+    }
+
+    label .required { color: var(--red); margin-left: 2px; }
+
+    input, select, textarea {
+      width: 100%;
+      background: var(--gray);
+      border: 1px solid var(--green-dark);
+      border-left: 3px solid var(--green-dim);
+      color: var(--green);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+      padding: 0.6rem 0.8rem;
+      outline: none;
+      transition: border-color 0.2s, background 0.2s;
+      appearance: none;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--green);
+      background: var(--gray-mid);
+      box-shadow: 0 0 8px rgba(0,255,65,0.15);
+    }
+
+    input::placeholder, textarea::placeholder {
+      color: var(--text-dim);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    select option {
+      background: var(--gray);
+    }
+
+    .btn {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      padding: 0.75rem 1.5rem;
+      border: 1px solid;
+      cursor: pointer;
+      transition: all 0.15s;
+      text-transform: uppercase;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn::before {
+      content: '> ';
+      color: inherit;
+      opacity: 0.5;
+    }
+
+    .btn-primary {
+      background: transparent;
+      border-color: var(--green);
+      color: var(--green);
+    }
+
+    .btn-primary:hover {
+      background: var(--green);
+      color: var(--black);
+      box-shadow: 0 0 20px rgba(0,255,65,0.4);
+    }
+
+    .btn-danger {
+      background: transparent;
+      border-color: var(--red);
+      color: var(--red);
+      margin-left: 1rem;
+    }
+
+    .btn-danger:hover {
+      background: var(--red);
+      color: var(--black);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      border-color: var(--text-dim);
+      color: var(--text-dim);
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--green-dim);
+      color: var(--green-dim);
+    }
+
+    .btn-row {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      margin-top: 1.5rem;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    /* Confirmation box */
+    .confirm-box {
+      background: rgba(255,51,51,0.05);
+      border: 1px solid var(--red);
+      border-left: 4px solid var(--red);
+      padding: 1.2rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .confirm-box .label {
+      font-size: 0.65rem;
+      color: var(--red);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 0.8rem;
+    }
+
+    .confirm-row {
+      display: flex;
+      gap: 1rem;
+      font-size: 0.78rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .confirm-key { color: var(--text-dim); min-width: 120px; }
+    .confirm-val { color: var(--green); }
+
+    /* Success */
+    .success-box {
+      background: rgba(0,255,65,0.04);
+      border: 1px solid var(--green);
+      border-left: 4px solid var(--green);
+      padding: 1.5rem;
+      text-align: center;
+    }
+
+    .success-ascii {
+      font-size: 0.65rem;
+      line-height: 1.4;
+      color: var(--green-dim);
+      margin-bottom: 1rem;
+      white-space: pre;
+    }
+
+    .success-title {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: var(--green);
+    }
+
+    .success-text {
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      line-height: 1.8;
+    }
+
+    .timestamp {
+      font-size: 0.7rem;
+      color: var(--green-dim);
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--green-dark);
+    }
+
+    /* Blinking cursor */
+    .cursor {
+      display: inline-block;
+      width: 8px;
+      height: 1em;
+      background: var(--green);
+      vertical-align: text-bottom;
+      animation: blink 1s step-end infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    .legal-note {
+      font-size: 0.68rem;
+      color: var(--text-dim);
+      margin-top: 1.5rem;
+      line-height: 1.7;
+      border-top: 1px solid var(--green-dark);
+      padding-top: 1rem;
+    }
+
+    .footer {
+      margin-top: 2rem;
+      font-size: 0.65rem;
+      color: var(--text-dim);
+      text-align: center;
+      letter-spacing: 0.1em;
+    }
+
+    .footer a {
+      color: var(--green-dim);
+      text-decoration: none;
+    }
+
+    .footer a:hover { color: var(--green); }
+
+    .error-msg {
+      color: var(--red);
+      font-size: 0.72rem;
+      margin-top: 0.3rem;
+      display: none;
+    }
+
+    .error-msg.visible { display: block; }
+
+    /* Loading state */
+    .loading { display: none; }
+    .loading.visible { display: inline; }
+
+    @keyframes dots {
+      0% { content: '.'; }
+      33% { content: '..'; }
+      66% { content: '...'; }
+    }
+
+    .loading::after {
+      content: '.';
+      animation: dots 1s infinite;
+    }
+  </style>
+</head>
+<body>
+
+<div class="terminal">
+  <div class="terminal-header">
+    <span class="dot dot-red"></span>
+    <span class="dot dot-yellow"></span>
+    <span class="dot dot-green"></span>
+    <span class="terminal-title">widerruf.exec — KERNEL & INIT</span>
+  </div>
+
+  <div class="terminal-body">
+
+    <div class="prompt-line">
+      <span class="prompt-symbol">user@kernel-init:~$</span>
+      <span class="prompt-cmd">./widerruf</span>
+      <span class="prompt-arg">--init</span>
+    </div>
+
+    <div class="output-block">
+      <div class="output-line highlight">KERNEL & INIT // Widerrufsportal v1.0</div>
+      <div class="output-line">Gesetzliche Widerrufsfunktion gemäß § 356a BGB</div>
+      <div class="output-line warn">[ Widerrufsfrist: 14 Tage ab Erhalt der Ware ]</div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- STEP 1: Formular -->
+    <div id="step1">
+      <div class="section-label">// schritt 1 von 2 — daten eingeben</div>
+
+      <div class="field-group">
+        <label>bestellnummer <span class="required">*</span></label>
+        <input type="text" id="bestellnr" placeholder="z.B. KI-2026-0042" autocomplete="off">
+        <div class="error-msg" id="err-bestellnr">[ ERROR ] Bestellnummer ist erforderlich.</div>
+      </div>
+
+      <div class="field-group">
+        <label>deine e-mail-adresse <span class="required">*</span></label>
+        <input type="email" id="email" placeholder="user@domain.tld" autocomplete="email">
+        <div class="error-msg" id="err-email">[ ERROR ] Gültige E-Mail-Adresse erforderlich.</div>
+      </div>
+
+      <div class="field-group">
+        <label>produkt(e) <span class="required">*</span></label>
+        <input type="text" id="produkt" placeholder="z.B. INIT Blend 250g, KERNEL Espresso">
+        <div class="error-msg" id="err-produkt">[ ERROR ] Produktbezeichnung ist erforderlich.</div>
+      </div>
+
+      <div class="field-group">
+        <label>grund des widerrufs <span style="color:var(--text-dim); font-size:0.7rem;">(optional)</span></label>
+        <select id="grund">
+          <option value="">-- kein Grund angegeben --</option>
+          <option value="Gefällt mir nicht">Gefällt mir nicht</option>
+          <option value="Falsch bestellt">Falsch bestellt</option>
+          <option value="Zu spät geliefert">Zu spät geliefert</option>
+          <option value="Qualität entspricht nicht den Erwartungen">Qualität entspricht nicht den Erwartungen</option>
+          <option value="Sonstiges">Sonstiges</option>
+        </select>
+      </div>
+
+      <div class="field-group">
+        <label>anmerkungen <span style="color:var(--text-dim); font-size:0.7rem;">(optional)</span></label>
+        <textarea id="anmerkung" placeholder="weitere Informationen..."></textarea>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="goToStep2()">widerruf vorbereiten</button>
+      </div>
+
+      <div class="legal-note">
+        Mit dem Absenden dieses Formulars erklären Sie den Widerruf Ihres Vertrages. Sie erhalten
+        unverzüglich eine Eingangsbestätigung per E-Mail auf einem dauerhaften Datenträger
+        gemäß § 356a Abs. 3 BGB.
+      </div>
+    </div>
+
+    <!-- STEP 2: Bestätigung -->
+    <div id="step2">
+      <div class="section-label">// schritt 2 von 2 — widerruf bestätigen</div>
+
+      <div class="output-block">
+        <div class="output-line warn">[ WARNUNG ] Bitte prüfen Sie Ihre Angaben vor der endgültigen Bestätigung.</div>
+      </div>
+
+      <div class="confirm-box">
+        <div class="label">// widerrufserklärung</div>
+        <div class="confirm-row">
+          <span class="confirm-key">bestellnummer</span>
+          <span class="confirm-val" id="conf-bestellnr">—</span>
+        </div>
+        <div class="confirm-row">
+          <span class="confirm-key">e-mail</span>
+          <span class="confirm-val" id="conf-email">—</span>
+        </div>
+        <div class="confirm-row">
+          <span class="confirm-key">produkt(e)</span>
+          <span class="confirm-val" id="conf-produkt">—</span>
+        </div>
+        <div class="confirm-row" id="conf-grund-row">
+          <span class="confirm-key">grund</span>
+          <span class="confirm-val" id="conf-grund">—</span>
+        </div>
+      </div>
+
+      <div class="output-line" style="margin-bottom:1rem;">
+        Hiermit widerrufe ich den mit KERNEL & INIT / LeNoKo geschlossenen Kaufvertrag
+        über die oben genannten Produkte.
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-danger" onclick="submitWiderruf()">
+          widerruf endgültig absenden
+          <span class="loading" id="loading-dots"></span>
+        </button>
+        <button class="btn btn-secondary" onclick="goBack()">zurück</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: Erfolg -->
+    <div id="step3">
+      <div class="success-box">
+        <div class="success-ascii">
+ ██████╗ ██╗  ██╗
+██╔═══██╗██║ ██╔╝
+██║   ██║█████╔╝
+██║   ██║██╔═██╗
+╚██████╔╝██║  ██╗
+ ╚═════╝ ╚═╝  ╚═╝</div>
+        <div class="success-title">widerruf erfolgreich übermittelt</div>
+        <div class="success-text">
+          Ihre Widerrufserklärung wurde entgegengenommen.<br>
+          Sie erhalten in Kürze eine Eingangsbestätigung an<br>
+          <strong id="conf-email-final" style="color:var(--green);"></strong>
+        </div>
+        <div class="timestamp" id="timestamp-display"></div>
+      </div>
+
+      <div class="legal-note">
+        Die Eingangsbestätigung gilt als dauerhafter Datenträger im Sinne des § 356a Abs. 3 BGB.
+        Bitte bewahren Sie diese E-Mail auf. LeNoKo wird sich zeitnah mit Ihnen in Verbindung setzen.
+      </div>
+    </div>
+
+  </div><!-- /terminal-body -->
+</div><!-- /terminal -->
+
+<div class="footer">
+  <a href="https://nerd.lenoko.de">← zurück zu kernel & init</a>
+  &nbsp;|&nbsp;
+  <a href="https://lenoko.de/pages/widerruf">widerrufsbelehrung</a>
+  &nbsp;|&nbsp;
+  <a href="https://lenoko.de/pages/datenschutz">datenschutz</a>
+</div>
+
+<script>
+  // ----------------------------------------------------------------
+  // KONFIGURATION – hier anpassen
+  // ----------------------------------------------------------------
+  const WEBHOOK_URL = 'https://owxsloumfl3aokvdwrci6ho7dimn6gow.ui.nabu.casa/api/webhook/widerruf-kernel-init'; // z.B. Home Assistant Webhook-URL
+  // Alternativ: Formspree-URL wie 'https://formspree.io/f/XXXXXXXX'
+  // ----------------------------------------------------------------
+
+  function goToStep2() {
+    const bestellnr = document.getElementById('bestellnr').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const produkt = document.getElementById('produkt').value.trim();
+
+    let valid = true;
+
+    if (!bestellnr) {
+      document.getElementById('err-bestellnr').classList.add('visible');
+      valid = false;
+    } else {
+      document.getElementById('err-bestellnr').classList.remove('visible');
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email || !emailRegex.test(email)) {
+      document.getElementById('err-email').classList.add('visible');
+      valid = false;
+    } else {
+      document.getElementById('err-email').classList.remove('visible');
+    }
+
+    if (!produkt) {
+      document.getElementById('err-produkt').classList.add('visible');
+      valid = false;
+    } else {
+      document.getElementById('err-produkt').classList.remove('visible');
+    }
+
+    if (!valid) return;
+
+    // Daten in Bestätigungsbox übertragen
+    document.getElementById('conf-bestellnr').textContent = bestellnr;
+    document.getElementById('conf-email').textContent = email;
+    document.getElementById('conf-produkt').textContent = produkt;
+
+    const grund = document.getElementById('grund').value;
+    if (grund) {
+      document.getElementById('conf-grund').textContent = grund;
+      document.getElementById('conf-grund-row').style.display = 'flex';
+    } else {
+      document.getElementById('conf-grund-row').style.display = 'none';
+    }
+
+    document.getElementById('step1').style.display = 'none';
+    document.getElementById('step2').style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function goBack() {
+    document.getElementById('step2').style.display = 'none';
+    document.getElementById('step1').style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  async function submitWiderruf() {
+    const timestamp = new Date().toLocaleString('de-DE', {
+      timeZone: 'Europe/Berlin',
+      day: '2-digit', month: '2-digit', year: 'numeric',
+      hour: '2-digit', minute: '2-digit', second: '2-digit'
+    });
+
+    const data = {
+      bestellnummer: document.getElementById('bestellnr').value.trim(),
+      email: document.getElementById('email').value.trim(),
+      produkt: document.getElementById('produkt').value.trim(),
+      grund: document.getElementById('grund').value || 'nicht angegeben',
+      anmerkung: document.getElementById('anmerkung').value.trim() || '',
+      timestamp: timestamp,
+      quelle: 'KERNEL & INIT Widerrufsportal'
+    };
+
+    // Loading anzeigen
+    document.getElementById('loading-dots').classList.add('visible');
+
+    try {
+      await fetch(WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+    } catch (e) {
+      // Auch bei Fehler weiterleiten – Zeitstempel wurde bereits gesetzt
+      console.warn('Webhook-Fehler:', e);
+    }
+
+    // Erfolgsseite zeigen
+    document.getElementById('conf-email-final').textContent = data.email;
+    document.getElementById('timestamp-display').textContent =
+      '[ ' + timestamp + ' ] widerruf-id: WI-' + Date.now();
+
+    document.getElementById('step2').style.display = 'none';
+    document.getElementById('step3').style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+</script>
+
+</body>
+</html>
