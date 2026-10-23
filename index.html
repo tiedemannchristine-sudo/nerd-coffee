@@ -3,596 +3,80 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KERNEL & INIT — Specialty Coffee by LeNoKo</title>
-<meta name="description" content="KERNEL & INIT — Specialty Coffee frisch auf Bestellung geröstet. Zwei Sorten, drei Größen. LeNoKo Rösterei, Linz am Rhein.">
-
-<link rel="icon" type="image/svg+xml" href="favicon.svg">
-<link rel="icon" type="image/png" sizes="32x32" href="icon-32.png">
-<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#0a0c0f">
-
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;600;800&family=Space+Grotesk:wght@300;400;600&display=swap" rel="stylesheet">
+<title>KERNEL & INIT — jetzt auf lenoko.de</title>
+<meta name="description" content="KERNEL und INIT: Specialty Coffee für Devs und Nerds. Jetzt direkt bei LeNoKo auf lenoko.de.">
+<meta http-equiv="refresh" content="2; url=https://lenoko.de/pages/kernel-und-init">
+<link rel="canonical" href="https://lenoko.de/pages/kernel-und-init">
 <style>
-  :root {
-    --bg:      #0a0c0f;
-    --panel:   #111419;
-    --border:  #1e2430;
-    --accent:  #00ff9d;
-    --accent2: #00c4ff;
-    --text:    #c8d0e0;
-    --muted:   #4a5568;
-    --red:     #ff3860;
-  }
+  :root { --bg:#0a0c0f; --panel:#111419; --border:#1e2430; --accent:#00ff9d; --accent2:#00c4ff; --text:#c8d0e0; --muted:#4a5568; }
   * { margin:0; padding:0; box-sizing:border-box; }
-  html { scroll-behavior:smooth; }
   body {
     background:var(--bg); color:var(--text);
-    font-family:'JetBrains Mono',ui-monospace,monospace;
-    overflow-x:hidden; line-height:1.5;
+    font-family:'JetBrains Mono','Consolas','Menlo',ui-monospace,monospace;
+    min-height:100vh; display:flex; align-items:center; justify-content:center;
+    padding:2rem; position:relative; overflow:hidden;
   }
   body::before {
-    content:''; position:fixed; inset:0; z-index:9999; pointer-events:none;
-    background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.04) 2px,rgba(0,0,0,0.04) 4px);
-  }
-  body::after {
     content:''; position:fixed; inset:0; z-index:0; pointer-events:none;
     background-image:linear-gradient(rgba(0,255,157,0.03) 1px,transparent 1px),
                      linear-gradient(90deg,rgba(0,255,157,0.03) 1px,transparent 1px);
     background-size:40px 40px;
   }
-
-  /* --- HEADER --- */
-  header {
-    position:fixed; top:0; left:0; right:0; z-index:100; height:56px;
-    border-bottom:1px solid var(--border);
-    background:rgba(10,12,15,0.93); backdrop-filter:blur(14px);
-    padding:0 2rem; display:flex; align-items:center; justify-content:space-between;
+  body::after {
+    content:''; position:fixed; inset:0; z-index:0; pointer-events:none;
+    background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.04) 2px,rgba(0,0,0,0.04) 4px);
   }
-  .logo { font-size:1rem; font-weight:800; letter-spacing:0.18em; color:var(--accent); text-transform:uppercase; text-decoration:none; }
-  .logo span { color:var(--text); }
-  .logo .accent2 { color:var(--accent2); }
-  .nav-links { display:flex; gap:1.5rem; font-size:0.6rem; letter-spacing:0.15em; }
-  .nav-links a { color:var(--muted); text-decoration:none; transition:color 0.2s; }
-  .nav-links a:hover { color:var(--accent); }
-
-  /* --- HERO --- */
-  .hero {
+  .box {
     position:relative; z-index:1;
-    min-height:92vh; padding:9rem 2rem 4rem;
-    display:flex; flex-direction:column; justify-content:center;
-    max-width:1200px; margin:0 auto;
+    max-width:560px; width:100%;
+    background:var(--panel); border:1px solid var(--border); padding:2.5rem;
   }
-  .hero-prompt { font-size:0.75rem; color:var(--muted); letter-spacing:0.2em; margin-bottom:1.5rem; }
-  .hero-prompt .pu { color:var(--accent); }
-  .hero-prompt .ph { color:var(--accent2); }
-  .hero-title {
-    font-size:clamp(3rem,10vw,8rem); font-weight:800; line-height:0.95;
-    letter-spacing:-0.03em; margin-bottom:1.5rem;
+  .box::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:2px;
+    background:linear-gradient(90deg,transparent,var(--accent),transparent);
   }
-  .hero-title .k { color:var(--accent); }
-  .hero-title .amp { color:var(--muted); }
-  .hero-title .i { color:var(--accent2); }
-  .hero-sub {
-    font-family:'Space Grotesk',sans-serif; font-size:clamp(1rem,1.6vw,1.3rem);
-    color:var(--text); max-width:640px; line-height:1.6; margin-bottom:1rem;
+  .prompt { font-size:0.65rem; color:var(--muted); letter-spacing:0.15em; margin-bottom:1.5rem; }
+  .prompt .pu { color:var(--accent); } .prompt .ph { color:var(--accent2); }
+  h1 {
+    font-size:clamp(1.8rem,5vw,2.4rem); font-weight:800; letter-spacing:-0.02em;
+    margin-bottom:0.5rem; line-height:1.1;
   }
-  .hero-tag { font-size:0.8rem; color:var(--muted); letter-spacing:0.08em; margin-bottom:3rem; }
-  .hero-cta {
-    display:inline-flex; align-items:center; gap:0.75rem; align-self:flex-start;
+  h1 .k { color:var(--accent); } h1 .amp { color:var(--muted); } h1 .i { color:var(--accent2); }
+  p {
+    font-family:'Space Grotesk',sans-serif;
+    font-size:0.95rem; line-height:1.65; color:var(--text); margin-top:1rem;
+  }
+  p a { color:var(--accent2); text-decoration:none; }
+  p a:hover { text-decoration:underline; }
+  .cta {
+    display:inline-block; margin-top:1.8rem;
     background:var(--accent); color:var(--bg);
-    padding:1rem 2rem; font-family:'JetBrains Mono',monospace;
+    padding:0.9rem 1.8rem; font-family:'JetBrains Mono',monospace;
     font-size:0.75rem; font-weight:800; letter-spacing:0.15em; text-transform:uppercase;
     text-decoration:none; transition:transform 0.15s, box-shadow 0.15s;
     box-shadow:0 4px 20px rgba(0,255,157,0.25);
   }
-  .hero-cta:hover { transform:translateY(-2px); box-shadow:0 8px 30px rgba(0,255,157,0.35); }
-  @keyframes blink { 0%,49% { opacity:1; } 50%,100% { opacity:0; } }
-  .cursor { display:inline-block; width:0.5em; height:1em; background:var(--accent); animation:blink 1s infinite; vertical-align:text-bottom; margin-left:4px; }
-
-  /* --- SECTION --- */
-  .section { position:relative; z-index:1; max-width:1200px; margin:0 auto; padding:6rem 2rem; }
-  .sec-label { font-size:0.6rem; color:var(--muted); letter-spacing:0.3em; margin-bottom:0.6rem; text-transform:uppercase; }
-  .sec-title { font-size:clamp(1.8rem,4vw,3rem); font-weight:800; letter-spacing:-0.02em; margin-bottom:2.5rem; }
-  .sec-title em { font-style:normal; color:var(--accent); }
-
-  /* --- PRODUCTS GRID --- */
-  .products-grid {
-    display:grid; grid-template-columns:1fr 1fr; gap:1px;
-    background:var(--border); border:1px solid var(--border);
+  .cta:hover { transform:translateY(-2px); box-shadow:0 8px 30px rgba(0,255,157,0.4); }
+  .meta { font-size:0.6rem; color:var(--muted); margin-top:1.8rem; letter-spacing:0.1em; }
+  @keyframes blink { 0%,49%{opacity:1;} 50%,100%{opacity:0;} }
+  .cursor {
+    display:inline-block; width:0.5em; height:1em;
+    background:var(--accent); animation:blink 1s infinite;
+    vertical-align:text-bottom; margin-left:4px;
   }
-  @media (max-width:800px) { .products-grid { grid-template-columns:1fr; } }
-
-  .product-card {
-    background:var(--panel); padding:2.5rem; position:relative; overflow:hidden;
-    transition:background 0.2s;
-  }
-  .product-card:hover { background:#161b24; }
-  .product-card::before {
-    content:''; position:absolute; top:0; left:0; right:0; height:2px;
-    opacity:0; transition:opacity 0.3s;
-  }
-  .card-kernel::before { background:linear-gradient(90deg,transparent,var(--accent),transparent); }
-  .card-init::before   { background:linear-gradient(90deg,transparent,var(--accent2),transparent); }
-  .product-card:hover::before { opacity:1; }
-
-  .prod-image {
-    display:block; width:100%; max-width:300px; height:auto;
-    margin:0 auto 1.8rem auto;
-    filter:drop-shadow(0 8px 28px rgba(0,0,0,0.45));
-  }
-  .prod-id { font-size:0.55rem; color:var(--muted); letter-spacing:0.22em; margin-bottom:1.2rem; text-transform:uppercase; }
-  .prod-name { font-size:3rem; font-weight:800; line-height:1; letter-spacing:-0.03em; margin-bottom:0.3rem; }
-  .card-kernel .prod-name { color:var(--accent); }
-  .card-init   .prod-name { color:var(--accent2); }
-  .prod-pid { font-size:0.65rem; color:var(--muted); margin-bottom:0.5rem; letter-spacing:0.08em; }
-  .prod-tagline { font-size:1rem; font-weight:600; color:var(--text); margin-bottom:1.2rem; letter-spacing:0.02em; }
-  .prod-desc {
-    font-family:'Space Grotesk',sans-serif; font-size:0.9rem; color:#9ca3af;
-    line-height:1.7; margin-bottom:1.5rem;
-  }
-
-  .prod-attrs { display:grid; grid-template-columns:1fr 1fr; gap:0.9rem; margin-bottom:1.8rem; }
-  .attr-k { font-size:0.55rem; color:var(--muted); letter-spacing:0.18em; text-transform:uppercase; }
-  .attr-v { font-size:0.82rem; color:var(--text); margin-top:0.2rem; }
-
-  .prod-buy {
-    border-top:1px solid var(--border); padding-top:1.2rem;
-    display:flex; flex-direction:column; gap:0.5rem;
-  }
-  .buy-row {
-    display:flex; align-items:center; justify-content:space-between;
-    padding:0.75rem 1.1rem; border:1px solid var(--border); background:var(--bg);
-    font-family:'JetBrains Mono',monospace;
-    transition:border-color 0.15s;
-  }
-  .buy-row.has-qty { border-color:var(--accent); }
-  .card-init .buy-row.has-qty { border-color:var(--accent2); }
-  .buy-size { font-size:0.75rem; letter-spacing:0.1em; color:var(--text); font-weight:700; flex:0 0 auto; min-width:3.5rem; }
-  .buy-price { font-size:0.85rem; color:var(--accent); font-weight:800; flex:1; text-align:right; margin-right:1rem; }
-  .card-init .buy-price { color:var(--accent2); }
-  .qty-ctrl { display:flex; align-items:center; gap:0.4rem; }
-  .qty-btn {
-    width:28px; height:28px; display:flex; align-items:center; justify-content:center;
-    background:var(--panel); border:1px solid var(--border); color:var(--text);
-    font-family:inherit; font-size:0.9rem; font-weight:700; cursor:pointer;
-    transition:all 0.15s; padding:0; line-height:1;
-  }
-  .qty-btn:hover { background:var(--accent); color:var(--bg); border-color:var(--accent); }
-  .card-init .qty-btn:hover { background:var(--accent2); border-color:var(--accent2); }
-  .qty-btn:disabled { opacity:0.4; cursor:not-allowed; }
-  .qty-btn:disabled:hover { background:var(--panel); color:var(--text); border-color:var(--border); }
-  .qty-val { min-width:1.8rem; text-align:center; font-size:0.9rem; font-weight:700; color:var(--text); font-variant-numeric:tabular-nums; }
-  .buy-note {
-    font-family:'Space Grotesk',sans-serif; font-size:0.72rem; color:var(--muted);
-    margin-top:0.8rem; line-height:1.5;
-  }
-  .buy-note strong { color:var(--text); }
-
-  /* --- Sticky Bottom Cart Bar --- */
-  .cart-bar {
-    position:fixed; bottom:0; left:0; right:0; z-index:200;
-    background:#0a0c0f; border-top:1px solid var(--accent);
-    padding:1rem 1.5rem; display:flex; align-items:center; justify-content:center; gap:1.5rem;
-    flex-wrap:wrap;
-    box-shadow:0 -8px 32px rgba(0,0,0,0.6);
-    transform:translateY(100%); transition:transform 0.25s ease;
-  }
-  .cart-bar.visible { transform:translateY(0); }
-  .cart-info {
-    font-family:'JetBrains Mono',monospace; font-size:0.85rem;
-    color:var(--text); letter-spacing:0.03em;
-    display:flex; gap:1.5rem; align-items:center; flex-wrap:wrap;
-  }
-  .cart-info .cart-icon { color:var(--accent); font-weight:800; letter-spacing:0.1em; }
-  .cart-info .cart-count { color:var(--muted); }
-  .cart-info .cart-total { color:var(--accent); font-weight:800; font-size:1rem; }
-  .cart-checkout {
-    display:inline-flex; align-items:center; gap:0.5rem;
-    background:var(--accent); color:var(--bg); border:none;
-    padding:0.85rem 1.8rem; font-family:'JetBrains Mono',monospace;
-    font-size:0.75rem; font-weight:800; letter-spacing:0.15em; text-transform:uppercase;
-    text-decoration:none; cursor:pointer; transition:transform 0.15s, box-shadow 0.15s;
-    box-shadow:0 4px 20px rgba(0,255,157,0.25);
-  }
-  .cart-checkout:hover { transform:translateY(-2px); box-shadow:0 8px 30px rgba(0,255,157,0.4); }
-  @media(max-width:600px) {
-    .cart-bar { padding:0.8rem 1rem; }
-    .cart-info { font-size:0.75rem; gap:1rem; }
-    .cart-checkout { padding:0.7rem 1.2rem; font-size:0.7rem; }
-  }
-  body.has-cart { padding-bottom:5.5rem; }
-
-  /* --- PROCESS SECTION --- */
-  .terminal-block {
-    background:var(--panel); border:1px solid var(--border); padding:2rem;
-    margin-bottom:2rem; position:relative;
-  }
-  .terminal-block::before {
-    content:attr(data-label); position:absolute; top:-0.65rem; left:1rem;
-    background:var(--panel); padding:0 0.5rem;
-    font-size:0.55rem; letter-spacing:0.2em; color:var(--accent); text-transform:uppercase;
-  }
-  .tline { font-size:0.78rem; line-height:2.1; }
-  .tline .cmd { color:var(--accent); margin-right:0.5rem; }
-  .tline .arg { color:var(--accent2); }
-  .tline .cmt { color:var(--muted); }
-
-  .process-steps {
-    display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-    gap:1px; background:var(--border); border:1px solid var(--border); margin-top:2rem;
-  }
-  .step {
-    background:var(--panel); padding:1.5rem;
-    display:flex; flex-direction:column; gap:0.5rem;
-  }
-  .step-num { font-size:0.65rem; color:var(--accent); letter-spacing:0.2em; }
-  .step-title { font-size:0.95rem; font-weight:700; color:var(--text); letter-spacing:0.02em; }
-  .step-desc { font-family:'Space Grotesk',sans-serif; font-size:0.82rem; color:var(--muted); line-height:1.5; }
-
-  /* --- NUTRITION / INFO SECTION --- */
-  .nutrition {
-    display:grid; grid-template-columns:1fr 1fr; gap:1px;
-    background:var(--border); border:1px solid var(--border); margin-top:2rem;
-  }
-  @media (max-width:800px) { .nutrition { grid-template-columns:1fr; } }
-  .nutrition-card { background:var(--panel); padding:2rem; }
-  .nutrition-card-title { font-size:0.75rem; color:var(--muted); letter-spacing:0.1em; margin-bottom:1.2rem; font-family:'JetBrains Mono',monospace; }
-  .nutrition-card-title span { font-weight:800; }
-  .nutrition-card-title.kernel-color span { color:var(--accent); }
-  .nutrition-card-title.init-color span   { color:var(--accent2); }
-  .nutrition-row {
-    display:flex; justify-content:space-between; align-items:baseline;
-    padding:0.6rem 0; border-bottom:1px dashed var(--border);
-    font-family:'Space Grotesk',sans-serif; font-size:0.85rem;
-  }
-  .nutrition-row:last-child { border-bottom:none; }
-  .nutrition-k { color:var(--muted); }
-  .nutrition-v { color:var(--text); }
-
-  /* --- CTA SECTION --- */
-  .final-cta {
-    background:var(--panel); border:1px solid var(--border);
-    padding:3rem 2rem; text-align:center; margin-top:2rem;
-  }
-  .final-cta-title { font-size:clamp(1.5rem,3vw,2.5rem); font-weight:800; letter-spacing:-0.02em; margin-bottom:1rem; }
-  .final-cta-title .k { color:var(--accent); } .final-cta-title .i { color:var(--accent2); }
-  .final-cta-sub {
-    font-family:'Space Grotesk',sans-serif; color:var(--muted); font-size:0.95rem;
-    margin-bottom:2rem; max-width:520px; margin-left:auto; margin-right:auto; line-height:1.6;
-  }
-  .final-cta-row { display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; }
-  .cta-btn {
-    display:inline-block; background:transparent; border:1px solid var(--accent); color:var(--accent);
-    padding:0.9rem 2rem; font-family:'JetBrains Mono',monospace;
-    font-size:0.75rem; font-weight:700; letter-spacing:0.15em; text-transform:uppercase;
-    text-decoration:none; transition:all 0.2s;
-  }
-  .cta-btn:hover { background:var(--accent); color:var(--bg); }
-
-  /* --- LEGAL BAND --- */
-  .legal-band {
-    position:relative; z-index:1; max-width:1200px; margin:0 auto;
-    padding:1.5rem 2rem; display:flex; flex-wrap:wrap; gap:0.5rem 2rem;
-    font-size:0.6rem; color:var(--muted); border-top:1px solid var(--border);
-    letter-spacing:0.1em;
-  }
-  .legal-band a { color:var(--muted); text-decoration:none; }
-  .legal-band a:hover { color:var(--accent); }
-
-  /* --- FOOTER --- */
-  footer {
-    position:relative; z-index:1; border-top:1px solid var(--border);
-    padding:1.5rem 2rem; max-width:1200px; margin:0 auto;
-    display:flex; justify-content:space-between; align-items:center;
-    flex-wrap:wrap; gap:0.5rem; font-size:0.65rem; color:var(--muted);
-  }
-  footer a { color:var(--muted); text-decoration:none; }
-  footer a:hover { color:var(--accent); }
-  .footer-brand { color:var(--accent); font-weight:800; letter-spacing:0.1em; }
 </style>
 </head>
 <body>
-
-<header>
-  <a href="#top" class="logo">KERNEL<span> &amp; </span><span class="accent2">INIT</span></a>
-  <nav class="nav-links">
-    <a href="#products">PRODUCTS</a>
-    <a href="#how">HOW IT WORKS</a>
-    <a href="https://lenoko.de">LENOKO.DE</a>
-  </nav>
-</header>
-
-<!-- HERO -->
-<section class="hero" id="top">
-  <div class="hero-prompt"><span class="pu">root@lenoko</span>:<span class="ph">~</span>$ cat README.md<span class="cursor"></span></div>
-  <h1 class="hero-title">
-    <span class="k">KERNEL</span><br>
-    <span class="amp">&amp;</span> <span class="i">INIT</span>
-  </h1>
-  <p class="hero-sub">
-    Specialty Coffee für Devs, Nerds und Coffee Lovers. Zwei Pakete, drei Größen, frisch auf Bestellung geröstet in der LeNoKo Rösterei in Linz am Rhein.
-  </p>
-  <p class="hero-tag">// zwei Packages. kein overhead. direkt gehandelt.</p>
-  <a class="hero-cta" href="#products">$ ls packages → jetzt stöbern</a>
-</section>
-
-<!-- PRODUCTS -->
-<section class="section" id="products">
-  <div class="sec-label">// available packages</div>
-  <h2 class="sec-title">Zwei <em>Pakete</em>. Kein Overhead.</h2>
-
-  <div class="products-grid">
-
-    <div class="product-card card-init">
-      <img class="prod-image" src="mockup_init.webp" alt="INIT — Espresso Blend von LeNoKo">
-      <div class="prod-id">PKG-001 // ESPRESSO_BLEND</div>
-      <div class="prod-name">INIT</div>
-      <div class="prod-pid">// process id: 1. der erste Befehl.</div>
-      <div class="prod-tagline">boot your day.</div>
-      <p class="prod-desc">Kräftiger Espresso-Blend aus der LeNoKo Rösterei. Schokoladig, ausgewogen, mit samtig-dichtem Body. Der Kaffee, den du um 06:00 Uhr willst — bevor der erste Pull Request reviewed wird.</p>
-
-      <div class="prod-attrs">
-        <div><div class="attr-k">Röstgrad</div><div class="attr-v">Medium-Dark</div></div>
-        <div><div class="attr-k">Profil</div><div class="attr-v">Schokolade · Nuss</div></div>
-        <div><div class="attr-k">Zubereitung</div><div class="attr-v">Espresso · Siebträger</div></div>
-        <div><div class="attr-k">Blend</div><div class="attr-v">70% Arabica · 30% Robusta</div></div>
-      </div>
-
-      <div class="prod-buy">
-        <div class="buy-row" data-variant="55151339569485" data-price="8.80" data-label="INIT 250g">
-          <span class="buy-size">$ 250g</span>
-          <span class="buy-price">8,80 €</span>
-          <span class="qty-ctrl">
-            <button class="qty-btn qty-minus" aria-label="weniger">−</button>
-            <span class="qty-val">0</span>
-            <button class="qty-btn qty-plus" aria-label="mehr">+</button>
-          </span>
-        </div>
-        <div class="buy-row" data-variant="55151339602253" data-price="15.90" data-label="INIT 500g">
-          <span class="buy-size">$ 500g</span>
-          <span class="buy-price">15,90 €</span>
-          <span class="qty-ctrl">
-            <button class="qty-btn qty-minus" aria-label="weniger">−</button>
-            <span class="qty-val">0</span>
-            <button class="qty-btn qty-plus" aria-label="mehr">+</button>
-          </span>
-        </div>
-        <div class="buy-row" data-variant="55151339635021" data-price="31.50" data-label="INIT 1kg">
-          <span class="buy-size">$ 1 kg</span>
-          <span class="buy-price">31,50 €</span>
-          <span class="qty-ctrl">
-            <button class="qty-btn qty-minus" aria-label="weniger">−</button>
-            <span class="qty-val">0</span>
-            <button class="qty-btn qty-plus" aria-label="mehr">+</button>
-          </span>
-        </div>
-        <div class="buy-note">// <strong>Mahlgrad?</strong> Im Warenkorb unter „spezielle Bestellanweisungen" angeben — sonst versenden wir ganze Bohnen.</div>
-      </div>
-    </div>
-
-    <div class="product-card card-kernel">
-      <img class="prod-image" src="mockup_kernel.webp" alt="KERNEL — Kaffeeröstung von LeNoKo">
-      <div class="prod-id">PKG-002 // MORNING_PROCESS</div>
-      <div class="prod-name">KERNEL</div>
-      <div class="prod-pid">// der Kern. volle Kontrolle.</div>
-      <div class="prod-tagline">full root access.</div>
-      <p class="prod-desc">Die Kaffee-Röstung — heller, zugänglicher, aber kein Kompromiss. Milde Säure, klares Profil, smooth im Abgang. Hoch fehlertoleranter Stack — läuft auf jeder Maschine, von der Filter-Referenz bis zur Aeropress.</p>
-
-      <div class="prod-attrs">
-        <div><div class="attr-k">Röstgrad</div><div class="attr-v">Medium</div></div>
-        <div><div class="attr-k">Profil</div><div class="attr-v">Honig · Schokolade</div></div>
-        <div><div class="attr-k">Zubereitung</div><div class="attr-v">Filter · Pourover · Aeropress</div></div>
-        <div><div class="attr-k">Blend</div><div class="attr-v">100% Arabica</div></div>
-      </div>
-
-      <div class="prod-buy">
-        <div class="buy-row" data-variant="55151335833933" data-price="8.80" data-label="KERNEL 250g">
-          <span class="buy-size">$ 250g</span>
-          <span class="buy-price">8,80 €</span>
-          <span class="qty-ctrl">
-            <button class="qty-btn qty-minus" aria-label="weniger">−</button>
-            <span class="qty-val">0</span>
-            <button class="qty-btn qty-plus" aria-label="mehr">+</button>
-          </span>
-        </div>
-        <div class="buy-row" data-variant="55151335866701" data-price="15.90" data-label="KERNEL 500g">
-          <span class="buy-size">$ 500g</span>
-          <span class="buy-price">15,90 €</span>
-          <span class="qty-ctrl">
-            <button class="qty-btn qty-minus" aria-label="weniger">−</button>
-            <span class="qty-val">0</span>
-            <button class="qty-btn qty-plus" aria-label="mehr">+</button>
-          </span>
-        </div>
-        <div class="buy-row" data-variant="55151335899469" data-price="31.50" data-label="KERNEL 1kg">
-          <span class="buy-size">$ 1 kg</span>
-          <span class="buy-price">31,50 €</span>
-          <span class="qty-ctrl">
-            <button class="qty-btn qty-minus" aria-label="weniger">−</button>
-            <span class="qty-val">0</span>
-            <button class="qty-btn qty-plus" aria-label="mehr">+</button>
-          </span>
-        </div>
-        <div class="buy-note">// <strong>Mahlgrad?</strong> Im Warenkorb unter „spezielle Bestellanweisungen" angeben — sonst versenden wir ganze Bohnen.</div>
-      </div>
-    </div>
-
+  <div class="box">
+    <div class="prompt"><span class="pu">root@lenoko</span>:<span class="ph">~</span>$ redirect --to=lenoko.de<span class="cursor"></span></div>
+    <h1><span class="k">KERNEL</span><span class="amp"> &amp; </span><span class="i">INIT</span></h1>
+    <p>sind in den Hauptshop auf <strong>lenoko.de</strong> umgezogen. In 2 Sekunden geht es automatisch dort weiter — oder manuell:</p>
+    <a class="cta" href="https://lenoko.de/pages/kernel-und-init">→ jetzt bei lenoko.de weitermachen</a>
+    <div class="meta">// LeNoKo Rösterei · Linz am Rhein</div>
   </div>
-</section>
-
-<!-- HOW IT WORKS -->
-<section class="section" id="how">
-  <div class="sec-label">// how it works</div>
-  <h2 class="sec-title">Der <em>Stack</em>.</h2>
-
-  <div class="terminal-block" data-label="lenoko.process.log">
-    <div class="tline"><span class="cmd">$</span> select_package <span class="arg">--name=INIT|KERNEL --size=250g|500g|1kg</span> <span class="cmt"># produkt wählen</span></div>
-    <div class="tline"><span class="cmd">$</span> add_note <span class="arg">"mahlgrad: ganze bohne"</span> <span class="cmt"># optional, sonst ganze Bohne</span></div>
-    <div class="tline"><span class="cmd">$</span> checkout <span class="arg">--payment=paypal|cc|klarna</span> <span class="cmt"># shopify übernimmt</span></div>
-    <div class="tline"><span class="cmd">$</span> roast_fresh <span class="arg">--batch=small</span> <span class="cmt"># 3–5 werktage</span></div>
-    <div class="tline"><span class="cmd">$</span> ship <span class="arg">--carrier=dpd|hermes --tracking=on</span></div>
-    <div class="tline cmt" style="color:var(--muted);">// → deine bestellung läuft, der kaffee kommt.</div>
-  </div>
-
-  <div class="process-steps">
-    <div class="step">
-      <div class="step-num">// 01</div>
-      <div class="step-title">Package wählen</div>
-      <div class="step-desc">INIT oder KERNEL, Packungsgröße bestimmen.</div>
-    </div>
-    <div class="step">
-      <div class="step-num">// 02</div>
-      <div class="step-title">Mahlgrad angeben</div>
-      <div class="step-desc">Im Warenkorb unter „spezielle Bestellanweisungen". Sonst: ganze Bohne.</div>
-    </div>
-    <div class="step">
-      <div class="step-num">// 03</div>
-      <div class="step-title">Frisch rösten</div>
-      <div class="step-desc">Kleine Chargen, aus Rohbohne direkt. 3–5 Werktage Lieferzeit.</div>
-    </div>
-    <div class="step">
-      <div class="step-num">// 04</div>
-      <div class="step-title">Versand mit Tracking</div>
-      <div class="step-desc">DPD oder Hermes. Du bekommst Trackingnummer per Mail.</div>
-    </div>
-  </div>
-</section>
-
-<!-- NUTRITION / INFO -->
-<section class="section">
-  <div class="sec-label">// specs</div>
-  <h2 class="sec-title">Datenblatt.</h2>
-
-  <div class="nutrition">
-    <div class="nutrition-card">
-      <div class="nutrition-card-title init-color"><span>INIT</span> // Espresso Blend</div>
-      <div class="nutrition-row"><span class="nutrition-k">Zusammensetzung</span><span class="nutrition-v">70% Arabica · 30% Robusta</span></div>
-      <div class="nutrition-row"><span class="nutrition-k">Herkunft Arabica</span><span class="nutrition-v">Honduras, Peru</span></div>
-      <div class="nutrition-row"><span class="nutrition-k">Herkunft Robusta</span><span class="nutrition-v">Indien</span></div>
-      <div class="nutrition-row"><span class="nutrition-k">Aufbereitung</span><span class="nutrition-v">Gewaschen</span></div>
-      <div class="nutrition-row"><span class="nutrition-k">Röstgrad</span><span class="nutrition-v">Medium-Dark</span></div>
-      <div class="nutrition-row"><span class="nutrition-k">Profil</span><span class="nutrition-v">Schokolade, Nuss, Crema</span></div>
-      <div class="nutrition-row"><span class="nutrition-k">Zubereitung</span><span class="nutrition-v">Espresso, Siebträger, Vollautomat</span></div>
-    </div>
-    <div class="nutrition-card">
-      <div class="nutrition-card-title kernel-color"><span>KERNEL</span> // Kaffeeröstung</div>
-      <div class="nutrition-row"><span class="nutrition-k">Zusammensetzung</span><span class="nutrition-v">100% Arabica</span></div>
-      <div class="nutrition-row"><span class="nutrition-k">Herkunft</span><span class="nutrition-v">Honduras, Peru</span></div>
-      <div class="nutrition-row"><span class="nutrition-k">Aufbereitung</span><span class="nutrition-v">Gewaschen</span></div>
-      <div class="nutrition-row"><span class="nutrition-k">Röstgrad</span><span class="nutrition-v">Medium</span></div>
-      <div class="nutrition-row"><span class="nutrition-k">Profil</span><span class="nutrition-v">Honig, Schokolade, mild</span></div>
-      <div class="nutrition-row"><span class="nutrition-k">Zubereitung</span><span class="nutrition-v">Filter, Pourover, Aeropress, French Press</span></div>
-      <div class="nutrition-row"><span class="nutrition-k">Säure</span><span class="nutrition-v">Mild · klar · smooth</span></div>
-    </div>
-  </div>
-</section>
-
-<!-- FINAL CTA -->
-<section class="section">
-  <div class="final-cta">
-    <div class="final-cta-title">Bereit? <span class="k">$</span> <span class="i">order_now</span></div>
-    <p class="final-cta-sub">Der Checkout läuft über lenoko.de — gewohnter Shopify-Flow mit PayPal, Kreditkarte oder Klarna. Mahlgrad nicht vergessen: Bestellnotiz im Warenkorb.</p>
-    <div class="final-cta-row">
-      <a href="#products" class="cta-btn cta-init">$ scroll to packages →</a>
-    </div>
-  </div>
-</section>
-
-<div class="legal-band">
-  <span>LeNoKo Rösterei · Linz am Rhein</span>
-  <a href="https://lenoko.de/policies/legal-notice">Impressum</a>
-  <a href="https://lenoko.de/policies/terms-of-service">AGB</a>
-  <a href="https://lenoko.de/policies/privacy-policy">Datenschutz</a>
-  <a href="https://lenoko.de/policies/refund-policy">Widerrufsbelehrung</a>
-</div>
-
-<footer>
-  <div><span class="footer-brand">KERNEL &amp; INIT</span> — specialty coffee by <a href="https://lenoko.de">LeNoKo Rösterei</a>, Linz am Rhein</div>
-  <div>© 2026 LeNoKo</div>
-</footer>
-
-<!-- Sticky Cart Bar -->
-<div class="cart-bar" id="cart-bar" role="region" aria-label="Warenkorb">
-  <div class="cart-info">
-    <span class="cart-icon">// CART</span>
-    <span class="cart-count"><span id="cart-count-val">0</span> Artikel</span>
-    <span class="cart-total" id="cart-total">0,00 €</span>
-  </div>
-  <a href="#" id="cart-checkout" class="cart-checkout">$ zum Warenkorb →</a>
-</div>
-
-<script>
-(function(){
-  const SHOP_BASE = 'https://lenoko.de';
-  const rows = Array.from(document.querySelectorAll('.buy-row[data-variant]'));
-  const bar  = document.getElementById('cart-bar');
-  const cnt  = document.getElementById('cart-count-val');
-  const tot  = document.getElementById('cart-total');
-  const btn  = document.getElementById('cart-checkout');
-
-  // State: variantId -> quantity
-  const qtys = Object.create(null);
-
-  function fmt(n) {
-    return n.toFixed(2).replace('.', ',') + ' €';
-  }
-
-  function renderBar() {
-    let count = 0, sum = 0;
-    const parts = [];
-    for (const row of rows) {
-      const id = row.dataset.variant;
-      const q  = qtys[id] || 0;
-      if (q > 0) {
-        count += q;
-        sum   += q * parseFloat(row.dataset.price);
-        parts.push(id + ':' + q);
-      }
-    }
-    cnt.textContent = count;
-    tot.textContent = fmt(sum);
-    if (count > 0) {
-      bar.classList.add('visible');
-      document.body.classList.add('has-cart');
-      btn.href = SHOP_BASE + '/cart/' + parts.join(',');
-    } else {
-      bar.classList.remove('visible');
-      document.body.classList.remove('has-cart');
-      btn.href = '#';
-    }
-  }
-
-  function updateRow(row) {
-    const id = row.dataset.variant;
-    const q  = qtys[id] || 0;
-    row.querySelector('.qty-val').textContent = q;
-    row.classList.toggle('has-qty', q > 0);
-    row.querySelector('.qty-minus').disabled = q <= 0;
-  }
-
-  for (const row of rows) {
-    const id = row.dataset.variant;
-    qtys[id] = 0;
-    updateRow(row);
-
-    row.querySelector('.qty-plus').addEventListener('click', function() {
-      qtys[id] = Math.min(99, (qtys[id] || 0) + 1);
-      updateRow(row);
-      renderBar();
-    });
-    row.querySelector('.qty-minus').addEventListener('click', function() {
-      qtys[id] = Math.max(0, (qtys[id] || 0) - 1);
-      updateRow(row);
-      renderBar();
-    });
-  }
-
-  btn.addEventListener('click', function(e){
-    if (btn.getAttribute('href') === '#') { e.preventDefault(); }
-  });
-})();
-</script>
-
+  <script>
+    // JS-Redirect zusätzlich zum meta-refresh (falls meta blockiert ist)
+    setTimeout(function(){ window.location.replace('https://lenoko.de/pages/kernel-und-init'); }, 1800);
+  </script>
 </body>
 </html>
